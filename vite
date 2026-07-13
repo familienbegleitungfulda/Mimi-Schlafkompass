@@ -1,0 +1,22 @@
+
+8:30:24 AM [vite] (client) Re-optimizing dependencies b
+8:30:24 AM [vite] (client) Re-optimizing dependencies because lockfile has changed
+Port 5173 is in use, trying another one...
+Port 5174 is in use, trying another one...
+Port 5175 is in use, trying another one...
+
+  VITE v8.1.4  ready in 1188 ms
+
+  ➜  Local:   http://localhost:5176/
+  ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+pwd
+ls
+
+ls
+pwd
+ls
+^Cls
+ls
+pwd
+ls

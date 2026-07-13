@@ -1,0 +1,28 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  background:#f6f4ef;
+  font-family:Inter,system-ui,sans-serif;
+  color:#2f2f2f;
+}
+
+button{
+  transition:.2s;
+}
+
+button:hover{
+  transform:translateY(-2px);
+  opacity:.95;
+}
+
+input{
+  outline:none;
+}
+
+input:focus{
+  border:1px solid #94af83;
+}
