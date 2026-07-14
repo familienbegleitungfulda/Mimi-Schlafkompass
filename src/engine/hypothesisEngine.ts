@@ -39,7 +39,7 @@ export interface Hypothesis {
         title: "Einschlafassoziation",
         confidence: 70,
         reason:
-          "Zum Einschlafen wird aktuell eine feste Unterstützung benötigt."
+          "Zum Einschlafen wird aktuell eine feste Unterstützung benötigt. Das kann häufig zu nächtlichem Aufwachen führen."
       });
     }
   

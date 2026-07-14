@@ -33,12 +33,15 @@ export const products = [
       id: "schlummerwerkstatt",
       title: "Schlummerwerkstatt",
       description:
-        "Der große Schlafkurs für Familien mit mehreren Schlafbaustellen.",
+        "Mayas umfassender Schlafkurs für Babys und Kleinkinder.",
       url: "https://familienbegleitung-fulda.tentary.com/p/e0luMj",
       when: [
         "Mehrere Ursachen",
         "Komplexe Situation",
-        "Schlafanalyse"
+        "Schlafanalyse",
+        "Einschlafassoziation",
+        "Schlafassoziation",
+        "Einschlafhilfe"
       ]
     },
   
@@ -46,14 +49,16 @@ export const products = [
       id: "beratung",
       title: "1:1 Schlafberatung",
       description:
-        "Für komplexe oder individuelle Schlafsituationen.",
+        "Individuelle bindungsorientierte Schlafberatung für komplexe Schlafsituationen.",
       url: "https://familienbegleitung-fulda.tentary.com/p/72qcPR",
       when: [
         "Gesundheit",
         "High Need",
         "Reflux",
         "Zungenband",
-        "Komplex"
+        "Komplex",
+        "Einschlafassoziation",
+        "Schlafassoziation"
       ]
     }
   ];

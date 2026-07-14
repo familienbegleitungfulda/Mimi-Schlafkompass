@@ -59,7 +59,7 @@ export function detectMainCause(memory: any) {
       id: "association",
       title: "Wahrscheinlichste Ursache",
       explanation:
-        "Die Einschlafbegleitung scheint aktuell eine wichtige Rolle zu spielen. Ob sie tatsächlich die Ursache oder eher eine Folge anderer Schlafbaustellen ist, sollte jedoch immer im Gesamtkontext betrachtet werden.",
+        "Die Einschlafbegleitung scheint aktuell eine wichtige Rolle zu spielen. Schlafassoziationen können häufig zu häufigem nächtlichen Aufwachen führen. Ob sie tatsächlich die Ursache oder eher eine Folge anderer Schlafbaustellen ist, sollte jedoch immer im Gesamtkontext betrachtet werden.",
     };
   }
 

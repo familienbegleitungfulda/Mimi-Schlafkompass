@@ -21,11 +21,15 @@ export function buildRecommendation(memory: any) {
   
     if (cause.id === "association") {
       return {
-        product: products.find((p) => p.id === "papa"),
+        product: products.find((p) => p.id === "schlummerwerkstatt"),
         reason: `
-  Nach allem, was du erzählt hast, scheint die Einschlafbegleitung aktuell ein wichtiger Baustein zu sein.
+  Nach allem, was du erzählt hast, fällt mir auf, dass eure Einschlafbegleitung eine wichtige Rolle spielt.
   
-  Deshalb könnte dieses Angebot euch besonders weiterhelfen.
+  Schlafassoziationen können häufig zu häufigem nächtlichen Aufwachen führen, weil das Kind die Einschlafhilfe bei jedem Schlafzyklus wieder braucht.
+  
+  Wenn eure Familie darunter leidet, kann es sinnvoll sein, die Schlafassoziation bindungsorientiert zu verändern – das ist aber immer eine individuelle Entscheidung.
+  
+  Genau dabei kann Mayas Unterstützung weiterhelfen – entweder in der 1:1 Schlafberatung oder in der Schlummerwerkstatt, Mayas umfassendem Schlafkurs für Babys und Kleinkinder.
   `,
       };
     }

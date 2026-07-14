@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { askMimi } from "../services/openai";
 import type { Message } from "./conversation";
 import { products as allProducts } from "../data/products";
+import ChatInput from "../components/ChatInput";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -306,50 +307,12 @@ Wie alt ist dein Kind aktuell?`,
         )}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          gap: 12,
-          marginTop: 24,
-        }}
-      >
-        <input
-          value={input}
-          onChange={(e) =>
-            setInput(e.target.value)
-          }
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              sendMessage();
-            }
-          }}
-          placeholder="Schreibe deine Nachricht..."
-          style={{
-            flex: 1,
-            padding: 18,
-            borderRadius: 16,
-            border: "1px solid #DDD",
-            fontSize: 16,
-          }}
-        />
-
-        <button
-          onClick={sendMessage}
-          disabled={loading}
-          style={{
-            background: "#9DB38E",
-            color: "white",
-            border: "none",
-            borderRadius: 16,
-            padding: "18px 28px",
-            cursor: "pointer",
-            fontSize: 16,
-            fontWeight: 600,
-          }}
-        >
-          Senden
-        </button>
-      </div>
+      <ChatInput
+        value={input}
+        onChange={setInput}
+        onSend={sendMessage}
+        loading={loading}
+      />
     </main>
   );
 }

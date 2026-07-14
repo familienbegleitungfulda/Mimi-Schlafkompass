@@ -106,7 +106,9 @@ Warum diese Ursachen wahrscheinlich sind
 
 Prioritäten
 
-5 konkrete Empfehlungen
+Erste Gedanken (maximal drei)
+
+Bei Schlafassoziationen: keine Anleitung zum Auflösen, sondern Erklärung des Zusammenhangs mit nächtlichem Aufwachen und Verweis auf Mayas Schlafberatung oder Schlummerwerkstatt
 
 danach ggf. passende Angebote von Maya
 `;

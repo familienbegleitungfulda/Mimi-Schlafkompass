@@ -43,7 +43,7 @@ export interface Score {
       score: association,
       explanation:
         association <= 2
-          ? "Zum Einschlafen scheint aktuell eine starke Unterstützung nötig zu sein."
+          ? "Zum Einschlafen scheint aktuell eine feste Unterstützung nötig zu sein. Schlafassoziationen können häufig zu häufigem nächtlichen Aufwachen führen."
           : "Es zeigen sich nur wenige Hinweise auf starke Einschlafassoziationen.",
     });
   
