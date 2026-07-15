@@ -11,6 +11,10 @@ export const products = [
         "Übermüdung",
         "Überreizung",
         "Tagschlaf",
+        "lange Einschlafbegleitung",
+        "Dauernuckeln",
+        "nächtliche Wachphasen",
+        "weinen in der Einschlafbegleitung",
         "Tagesstruktur"
       ]
     },
@@ -22,10 +26,12 @@ export const products = [
         "Wenn das Einschlafen bisher nur mit Mama funktioniert.",
       url: "https://familienbegleitung-fulda.tentary.com/p/pSRIkX",
       when: [
-        "Brust",
-        "Mama",
+      
         "Stillen",
-        "Einschlafhilfe"
+        "weint bei Papa",
+        "schläft nicht bei Papa",
+        "lässt sich von Papa nicht beruhigen",
+        "Papa klappt nicht"
       ]
     },
   
@@ -40,8 +46,8 @@ export const products = [
         "Komplexe Situation",
         "Schlafanalyse",
         "Einschlafassoziation",
-        "Schlafassoziation",
-        "Einschlafhilfe"
+        "Schlafassoziation"
+    
       ]
     },
   

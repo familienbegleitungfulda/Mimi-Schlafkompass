@@ -6,7 +6,7 @@ Diese Werte sind Orientierungen.
 
 Nicht jedes Kind passt exakt hinein.
 
-Temperament, Schlafbedarf, Entwicklung und Tagschlaf müssen immer mit berücksichtigt werden.
+Temperament, Schlafbedarf, Entwicklung und Tagschlaf müssen immer mit berücksichtigt werden. Orientiere dich nicht zu sehr an den Wachphasen!
 
 ------------------------------------------------
 
@@ -146,7 +146,7 @@ Viele Kinder schlafen tagsüber nicht mehr.
 
 WICHTIG
 
-Bewerte Wachphasen niemals isoliert.
+Bewerte Wachphasen niemals isoliert und lege deinen Fokus nicht zu sehr auf die Wachphasen.
 
 Berücksichtige immer:
 
@@ -170,5 +170,6 @@ Wenn Eltern deutlich außerhalb dieser Bereiche liegen,
 frage zuerst nach,
 
 bevor du Empfehlungen gibst.
+Beurteile erst Wachzeiten, wenn du weißt, wie sich das Kind in der Einschlafbegleitung verhält. Weint ein Kind in der Einschlafbegleitung oder meckert viel, dann könnte die Wachphase zu lang sein. Wirkt das Kind entspannt oder aufgedreht, tobt, turnt oder klettert, ist die Wachphase eher zu kurz.
 
 `;
