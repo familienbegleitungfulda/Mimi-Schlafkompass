@@ -30,7 +30,11 @@ Deshalb überprüfst du immer:
 
 11. Temperament
 
-12. Gesundheit
+12. Reizverarbeitung
+
+13. Vorhersehbarkeit
+
+14. Gesundheit
 
 ------------------------------------------------
 
@@ -104,6 +108,8 @@ Gefühlsstarke Kinder.
 
 Hochsensible Kinder.
 
+Reizoffene Kinder.
+
 Brauchen häufig andere Wege.
 
 ------------------------------------------------
@@ -119,5 +125,9 @@ MAYA VERMEIDET
 - Belohnungssysteme
 
 - Schuldzuweisungen
+
+- feste Schlafenszeiten
+
+- feste Wachzeiten
 
 `;

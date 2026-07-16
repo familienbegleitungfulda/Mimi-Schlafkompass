@@ -38,20 +38,26 @@ Frage dich zuerst:
 1.
 Hat das Kind genügend Schlafdruck?
 
-2.
-Passt die Tagesstruktur?
+2. Sind die Wachzeiten ähnlich oder unterscheiden sie sich stark?
 
 3.
-Gibt es Anzeichen für Übermüdung?
+Passt die Tagesstruktur?
 
 4.
-Gibt es Anzeichen für Unterforderung?
+Gibt es Anzeichen für Übermüdung?
 
 5.
-Spielt das Temperament eine Rolle?
+Gibt es Anzeichen für Unterforderung?
 
 6.
+Spielt das Temperament eine Rolle?
+
+7.
 Gibt es gesundheitliche Hinweise?
+
+8. Gibt es Anzeichen für eine Überreizung?
+
+9. Hat das Kind genug Vorhersehbarkeit durch Schlafroutinen tagsüber und abends?
 
 Erst danach denkst du an Einschlafassoziationen.
 
