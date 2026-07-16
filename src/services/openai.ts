@@ -71,14 +71,11 @@ export async function askMimi(messages: Message[]) {
   (globalThis as any).__mimiMemory = memory;
   const reasoning = shouldAnalyse(memory);
 
-  const recommendation =
-  buildRecommendation(memory);
+  const recommendation = buildRecommendation(memory);
 
-const products = recommendation.product
-  ? [recommendation.product]
-  : [];
-  const recommendationReason =
-  recommendation.reason;
+  const products = recommendation.product
+    ? [recommendation.product]
+    : [];
 
   const prompt = `
 ${knowledge}
@@ -103,7 +100,7 @@ ${redFlags}
 
 ${buildPrompt(
   memory,
-  recommendationReason
+  recommendation
 )}
 
 WICHTIG
@@ -128,7 +125,9 @@ Wenn Analyse erlaubt = JA
 
 → Erstelle die Analyse.
 
-→ Danach genau EINE Produktempfehlung.
+→ Schreibe am Ende 2–4 personalisierte Sätze zur Produktempfehlung (ohne Kursnamen – siehe PRODUKTEMPFEHLUNG).
+
+→ Nenne im Fließtext NIEMALS einen Kursnamen oder Produkttitel.
 
 → Beende die Antwort mit
 

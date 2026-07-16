@@ -1,10 +1,11 @@
 import { getFollowUpQuestion } from "./followUpEngine";
 import { buildHypotheses } from "./hypothesisEngine";
 import { shouldAnalyse } from "./reasoningEngine";
+import type { Recommendation } from "./productEngine";
 
 export function buildPrompt(
     memory:any,
-    recommendationReason:string
+    recommendation: Recommendation
 ) {
   const hypotheses = buildHypotheses(memory);
   const reasoning = shouldAnalyse(memory);
@@ -532,31 +533,36 @@ Die eigentliche Lösung findet ausschließlich im empfohlenen Angebot statt.
 
 PRODUKTEMPFEHLUNG
 
-Empfiehl genau EIN Angebot.
+Unter deiner Antwort erscheint automatisch genau EIN Angebot als Produktkarte.
 
-Bevor du das Angebot nennst, erklärst du individuell:
+Das empfohlene Angebot (NUR für dein Wissen – NIEMALS im Fließtext nennen):
 
-• Was dir aufgefallen ist.
+Titel: ${recommendation.product?.title ?? "–"}
+Beschreibung: ${recommendation.product?.description ?? "–"}
+Schwerpunkte: ${recommendation.courseFocus.join(", ")}
 
-• Warum du genau diesen Zusammenhang vermutest.
+Aus den Antworten erkannte Herausforderungen:
 
-• Warum genau dieses Angebot zu dieser Situation passt.
+${recommendation.detectedIssues.length > 0
+  ? recommendation.detectedIssues.map((issue) => `• ${issue}`).join("\n")
+  : "• Keine spezifischen Hinweise"}
 
-Nutze ausschließlich folgende Begründung:
+Anleitung für den Fließtext am Ende deiner Analyse:
 
-${recommendationReason}
+${recommendation.guidance}
 
-Erst DANACH nennst du:
+WICHTIG – NIEMALS im Fließtext:
 
-Titel
+- Keinen Kursnamen nennen (z. B. Schlummerwerkstatt, Mini-Kurs, Schlafbasis, Struktur & Überreizung)
+- Keinen Produkttitel nennen
+- Keine Formulierung wie "Ich empfehle dir den Kurs..."
+- Titel und Beschreibung des Angebots nicht wiederholen – die Produktkarte darunter zeigt das automatisch
 
-Kurzbeschreibung
+Der konkrete Produktname erscheint ausschließlich in der Produktkarte unter der Analyse.
 
-Der Link erscheint automatisch.
+Schreibe keine allgemeine Werbebeschreibung. Beziehe dich immer auf die individuellen Antworten der Familie.
 
-Verkaufe nicht.
-
-Erkläre.
+Verkaufe nicht. Erkläre den persönlichen Bezug.
 
 -----------------------------------------------------
 
