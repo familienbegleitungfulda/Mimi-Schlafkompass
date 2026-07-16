@@ -1,21 +1,23 @@
 export const ageProfiles = `
 
-ALTER 0-3 MONATE
+ALTER 0-5 MONATE
 
 Schwerpunkte:
 
-- Stillen
+- Stillen / Füttern als normale Einschlafhilfe
 - Regulation
 - Clusterfeeding
 - Tag-Nacht-Rhythmus
 - Körperkontakt
 - Reize reduzieren
+- Nervensystem
 
 Nicht empfehlen:
 
 - Schlaftraining
 - feste Routinen
 - Durchschlafen
+- Stillen oder Flasche als Schlafassoziation bewerten
 
 ------------------------------------------------
 
@@ -29,6 +31,7 @@ Schwerpunkte:
 - erste Routinen
 - Schlafdruck
 - Überreizung
+- Reizverarbeitung
 
 ------------------------------------------------
 
@@ -40,10 +43,10 @@ Schwerpunkte:
 - Wachphasen
 - Beikost
 - Trennungsentwicklung
-- Einschlafassoziationen
-- lange Einschlafbegleitungen
-- Bedürfnisverschiebung 
+- Schlafstruktur
+- Bedürfnisverschiebung
 - häufiges nächtliches Erwachen
+- mögliche Schlafassoziationen nur zurückhaltend und nie als erste Stellschraube
 
 ------------------------------------------------
 

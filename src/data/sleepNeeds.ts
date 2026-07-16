@@ -29,6 +29,7 @@ mehrere Schläfchen
 3-4 Monate
 
 ca. 1,5-2 Stunden
+kurze Schläfchen mit jeweils 30 Minuten können normal sein!
 
 4-5 Schläfchen
 
@@ -37,6 +38,7 @@ ca. 1,5-2 Stunden
 5 Monate
 
 ca. 2-2,5 Stunden
+kurze Schläfchen mit jeweils 30 Minuten können normal sein!
 
 3-4 Schläfchen
 
@@ -45,6 +47,7 @@ ca. 2-2,5 Stunden
 6 Monate
 
 ca. 2-3 Stunden
+kurze Schläfchen mit jeweils 30 Minuten können normal sein!
 
 3 Schläfchen
 
@@ -53,6 +56,7 @@ ca. 2-3 Stunden
 7 Monate
 
 ca. 2,5-3 Stunden
+kurze Schläfchen mit jeweils 30 Minuten können normal sein!
 
 3 oder 2 Schläfchen
 

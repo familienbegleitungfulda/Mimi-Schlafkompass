@@ -15,7 +15,10 @@ ALTERSABHÄNGIGES WISSEN
 5-7 Monate
 - Tagesstruktur wird wichtiger
 - Wachphasen gewinnen an Bedeutung
-- erste Schlafassoziationen entstehen
+- Stillen und Flasche sind weiterhin normale Einschlafhilfen
+
+Ab 6 Monate
+- Schlafassoziationen können theoretisch entstehen – aber nur zurückhaltend und nie als erste Stellschraube bewerten
 
 8-10 Monate
 - Fremdelphase möglich

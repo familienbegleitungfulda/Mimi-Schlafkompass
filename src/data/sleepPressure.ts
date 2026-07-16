@@ -4,13 +4,18 @@ SCHLAFDRUCK
 
 Schlafdruck ist einer der wichtigsten Faktoren der Schlafberatung.
 
+In den meisten Fällen verbessert eine passende Schlafstruktur den Schlaf deutlich stärker als frühes Arbeiten an Einschlafassoziationen.
+
 Bevor du Empfehlungen gibst, überprüfst du immer:
 
 - Alter
-- Wachphasen
+- Wachphasen / Wachzeiten
 - Anzahl Schläfchen
 - Dauer der Schläfchen
 - Müdigkeitszeichen
+- Reizverarbeitung
+- Vorhersehbarkeit des Tagesablaufs
+- Nervensystem-Regulation
 
 ------------------------------------------------
 
