@@ -359,7 +359,7 @@ Wie alt ist dein Kind aktuell?`,
                     {module.title}
                   </h3>
 
-                  {module.recommendation?.focusTitle && (
+                  {module.recommendation?.topicHint && (
                     <p
                       style={{
                         color: theme.goldAccent,
@@ -368,7 +368,7 @@ Wie alt ist dein Kind aktuell?`,
                         marginBottom: 12,
                       }}
                     >
-                      Fokus: {module.recommendation.focusTitle}
+                      Schwerpunkt: {module.recommendation.topicHint}
                     </p>
                   )}
 

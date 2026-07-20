@@ -1,5 +1,6 @@
 import type { ModeRecommendation } from "./recommendationEngine";
 import { formatModuleRecommendationsForPrompt } from "../data/course/moduleRecommendationBuilder";
+import { formatOfficialModuleList } from "../data/course/officialModules";
 import type { ResolvedCourseModule } from "../data/course";
 
 function formatDetectedIssues(recommendation: ModeRecommendation): string {
@@ -31,12 +32,19 @@ Anleitung für den Fließtext am Ende deiner Analyse:
 
 ${recommendation.guidance}
 
+WICHTIG – ABLAUF:
+
+1. Zuerst 3–5 konkrete, individuelle Impulse und erste Empfehlungen – nummeriert und sofort hilfreich.
+2. Erst danach kurz erklären, warum das Angebot die Tipps ergänzen und vertiefen würde – nicht ersetzen.
+3. Eltern sollen spüren, dass sie bereits Unterstützung erhalten haben.
+
 WICHTIG – NIEMALS im Fließtext:
 
 - Keinen Kursnamen nennen (z. B. Schlummerwerkstatt, Mini-Kurs, Schlafbasis, Struktur & Überreizung)
 - Keinen Produkttitel nennen
 - Keine Formulierung wie "Ich empfehle dir den Kurs..."
 - Titel und Beschreibung des Angebots nicht wiederholen – die Produktkarte darunter zeigt das automatisch
+- Die Analyse NICHT direkt mit der Produktempfehlung beenden – immer zuerst die Tipps
 
 Der konkrete Produktname erscheint ausschließlich in der Produktkarte unter der Analyse.
 
@@ -85,6 +93,17 @@ Die Familie hat bereits Zugang zur Schlummerwerkstatt.
 Verkaufe KEINE externen Kurse oder Produkte. Empfehle ausschließlich konkrete Module aus der Schlummerwerkstatt.
 Empfehle NIEMALS Produkte aus dem öffentlichen Schlafkompass (Mini-Kurs, 1:1 Beratung usw.).
 
+OFFIZIELLE MODULNAMEN (ausschließlich diese verwenden):
+
+${formatOfficialModuleList()}
+
+VERBOTEN – keine erfundenen Modulbezeichnungen wie:
+- Schlafdruck und Wachzeiten
+- Tagesstruktur und Vorhersehbarkeit
+- Reizverarbeitung und Nervensystem
+
+Themen intern erkennen und dem passenden offiziellen Modul zuordnen.
+
 Die Modulkarten werden NUR angezeigt, wenn deine Antwort mit ### ANALYSE BEENDET ### endet.
 
 Empfohlene Module mit Begründung (erscheinen automatisch als Karten unter der Analyse):
@@ -102,18 +121,19 @@ ${recommendation.guidance}
 PFLICHTFORMAT für die Modulempfehlung:
 
 1. Gesamtbild zusammenfassen.
-2. Für jedes Modul einzeln und nummeriert nach Priorität:
-   - Modultitel und konkreter Fokus (z. B. "Federwiege liebevoll abgewöhnen")
+2. 3–5 konkrete Impulse und erste Empfehlungen geben.
+3. Für jedes Modul einzeln und nummeriert nach Priorität – ausschließlich mit offiziellen Modulnamen:
+   - z. B. "Modul 3 – Struktur" oder "Modul 5 – Gewohnheiten verändern"
    - Warum es zu den Antworten passt
    - Welches Problem es lösen soll
    - Warum es diese Priorität hat
-3. Bei Strukturproblemen + Einschlafhilfe: erst Struktur/Reizverarbeitung, dann Einschlafhilfe.
+4. Bei Strukturproblemen + Einschlafhilfe: erst Modul 3 – Struktur, dann Modul 5 – Gewohnheiten verändern.
 
 STRENG VERBOTEN:
+- Erfundene Modulnamen statt der offiziellen Bezeichnungen
 - "ein Angebot könnte passen"
 - "Genau deshalb könnte dieses Angebot …"
-- "Das passende Angebot findest du …"
-- Allgemeine Werbung statt konkreter Modulnamen
+- Allgemeine Werbung statt konkreter offizieller Modulnamen
 `.trim();
 }
 
@@ -160,10 +180,11 @@ Analyse noch NICHT erlaubt.
 Nach der vollständigen Analyse:
 
 → Fasse zuerst das Gesamtbild zusammen.
-→ Empfehle konkrete Module der Schlummerwerkstatt – mit Modultitel, Fokus, Begründung, Problem und Priorität.
-→ Erkläre die Reihenfolge (z. B. erst Schlafstruktur, dann Federwiege).
+→ Gib 3–5 konkrete Impulse und erste Empfehlungen.
+→ Empfehle Module ausschließlich mit offiziellen Namen (Modul 1–8).
+→ Erkläre die Reihenfolge (z. B. erst Modul 3 – Struktur, dann Modul 5 – Gewohnheiten verändern).
 → Gib konkrete Handlungsschritte für heute.
-→ Verwende KEINE allgemeinen Angebots-Formulierungen.
+→ Verwende KEINE erfundenen Modulbezeichnungen.
 → Beende die Antwort mit
 
 ### ANALYSE BEENDET ###
@@ -173,9 +194,10 @@ Nach der vollständigen Analyse:
   return `
 Nach der Analyse:
 
-→ Schreibe 2–4 personalisierte Sätze zur Produktempfehlung (ohne Kursnamen – siehe PRODUKTEMPFEHLUNG).
+→ Gib zuerst 3–5 konkrete, individuelle Impulse und erste Empfehlungen (nummeriert).
+→ Erst danach kurz erklären, warum das Angebot die Tipps ergänzen würde – nicht ersetzen.
 → Nenne im Fließtext NIEMALS einen Kursnamen oder Produkttitel.
-→ Die Produktkarte erscheint automatisch unter deiner Antwort – du musst den Produktnamen nicht nennen.
+→ Die Produktkarte erscheint automatisch unter deiner Antwort.
 → Beende die Antwort zwingend mit
 
 ### ANALYSE BEENDET ###

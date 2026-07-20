@@ -2,6 +2,7 @@ import type { AppMode } from "../config";
 import {
   buildCourseModuleRecommendation,
   formatModuleRecommendationsForPrompt,
+  formatOfficialModuleList,
   getTodayActionTexts,
   type ResolvedCourseModule,
 } from "../data/course";
@@ -97,6 +98,30 @@ function buildAnalysisContext(memory: any): AnalysisContext {
   };
 }
 
+const PUBLIC_ANALYSIS_END_FLOW = `
+ABLAUF AM ENDE DER ANALYSE (Schlafkompass):
+
+1. Gib zuerst 3–5 konkrete, individuelle Impulse und erste Empfehlungen auf Basis der Antworten.
+   - Nummeriere die Tipps klar.
+   - Jeder Tipp soll sofort umsetzbar sein und echten Mehrwert bieten.
+   - Beziehe jeden Tipp direkt auf das, was die Familie geschrieben hat.
+
+2. Erst danach (2–3 Sätze) erkläre, warum das empfohlene Angebot diese Tipps ergänzen und vertiefen würde – nicht ersetzen.
+   - Die Eltern sollen spüren: Sie haben bereits Unterstützung erhalten.
+   - Formuliere, dass die Tipps ein guter erster Schritt sind und im Angebot Themen tiefer, strukturierter oder Schritt für Schritt bearbeitet werden.
+   - Nenne KEINEN Kursnamen und KEINEN Produkttitel.
+
+Die Produktkarte erscheint automatisch unter der Analyse.
+`.trim();
+
+function buildPublicProductBridge(contextHint: string): string {
+  return `
+${PUBLIC_ANALYSIS_END_FLOW}
+
+Schwerpunkt für die Tipps und die Brücke zum Angebot: ${contextHint}
+  `.trim();
+}
+
 function buildPublicRecommendation(memory: any): PublicRecommendation {
   const context = buildAnalysisContext(memory);
   const cause = detectMainCause(memory);
@@ -116,19 +141,13 @@ function buildPublicRecommendation(memory: any): PublicRecommendation {
         "Tagschlaf anpassen",
         "leichter in den Schlaf finden",
       ],
-      guidance: `
-Schreibe 2–4 personalisierte Sätze, die die erkannten Herausforderungen der Familie konkret aufgreifen – besonders Wachzeiten, Schlafdruck, Tagschlaf oder Tagesstruktur.
-
-Stelle den Zusammenhang her, dass genau diese Themen im empfohlenen Angebot behandelt werden – z. B. wie der Tagesablauf strukturiert wird, Reize besser dosiert werden und das Kind leichter in den Schlaf findet.
-
-${
-  isPossibleSleepAssociation(memory)
-    ? "Falls eine mögliche Schlafassoziation erkennbar ist: höchstens kurz erwähnen, dass das erst später relevant werden könnte – Fokus bleibt auf Schlafstruktur."
-    : ""
-}
-
-Beende mit: "Genau deshalb könnte dieses Angebot aktuell besonders gut zu euch passen."
-      `.trim(),
+      guidance: buildPublicProductBridge(
+        `Wachzeiten, Schlafdruck, Tagschlaf, Tagesstruktur und Reizdosierung.${
+          isPossibleSleepAssociation(memory)
+            ? " Falls eine mögliche Schlafassoziation erkennbar ist: höchstens kurz erwähnen, dass das erst später relevant werden könnte – Fokus bleibt auf Schlafstruktur."
+            : ""
+        }`
+      ),
     };
   }
 
@@ -146,13 +165,9 @@ Beende mit: "Genau deshalb könnte dieses Angebot aktuell besonders gut zu euch 
         "Über- oder Unterforderung erkennen",
         "Tagesstruktur anpassen",
       ],
-      guidance: `
-Schreibe 2–4 personalisierte Sätze, die die erkannten Herausforderungen der Familie konkret aufgreifen – besonders Reizverarbeitung, Überreizung oder Nervensystem-Belastung.
-
-Stelle den Zusammenhang her, dass genau diese Themen im empfohlenen Angebot behandelt werden – z. B. wie Reize besser dosiert werden und das Kind dabei unterstützt wird, leichter zur Ruhe zu kommen.
-
-Beende mit: "Genau deshalb könnte dieses Angebot aktuell besonders gut zu euch passen."
-      `.trim(),
+      guidance: buildPublicProductBridge(
+        "Reizverarbeitung, Überreizung, Nervensystem-Belastung und Tagesstruktur."
+      ),
     };
   }
 
@@ -169,13 +184,9 @@ Beende mit: "Genau deshalb könnte dieses Angebot aktuell besonders gut zu euch 
         "bindungsorientierte Begleitung",
         "maßgeschneiderte Lösungen",
       ],
-      guidance: `
-Schreibe 2–4 personalisierte Sätze, die die gesundheitlichen Hinweise und die Schlafherausforderungen der Familie konkret aufgreifen.
-
-Stelle den Zusammenhang her, dass eine individuelle, persönliche Begleitung bei dieser Komplexität sinnvoll sein könnte.
-
-Beende mit: "Genau deshalb könnte dieses Angebot aktuell besonders gut zu euch passen."
-      `.trim(),
+      guidance: buildPublicProductBridge(
+        "Gesundheitliche Besonderheiten und individuelle Schlafherausforderungen – wann persönliche Begleitung sinnvoll ist."
+      ),
     };
   }
 
@@ -191,13 +202,9 @@ Beende mit: "Genau deshalb könnte dieses Angebot aktuell besonders gut zu euch 
       "bindungsorientierte Begleitung",
       "individuelle Schwerpunkte setzen",
     ],
-    guidance: `
-Schreibe 2–4 personalisierte Sätze, die die verschiedenen erkannten Herausforderungen der Familie konkret aufgreifen.
-
-Stelle den Zusammenhang her, dass ein umfassender Blick auf die Schlafsituation sinnvoll sein könnte – mit Fokus auf Schlafstruktur und Nervensystem, bevor einzelne Baustellen isoliert betrachtet werden.
-
-Beende mit: "Das passende Angebot findest du direkt unter dieser Analyse."
-    `.trim(),
+    guidance: buildPublicProductBridge(
+      "Mehrere Schlafbaustellen gemeinsam – Schlafstruktur, Nervensystem und individuelle Schwerpunkte."
+    ),
   };
 }
 
@@ -231,42 +238,54 @@ function buildCourseRecommendation(
     todaySteps,
     courseFocus: modules.map(
       (module) =>
-        module.recommendation?.focusTitle ?? module.title
+        module.recommendation?.topicHint ?? module.title
     ),
     guidance: `
 Die Familie hat bereits Zugang zur Schlummerwerkstatt. Verkaufe KEINE externen Kurse oder Produkte.
 
 Empfehle IMMER konkrete Module aus der Schlummerwerkstatt – niemals allgemein "ein Angebot" oder "etwas könnte passen".
 
+OFFIZIELLE MODULNAMEN (ausschließlich diese verwenden – keine erfundenen Bezeichnungen):
+
+${formatOfficialModuleList()}
+
+Themen-Zuordnung (intern erkennen, offiziellen Modulnamen empfehlen):
+- Schlafdruck, Wachzeiten, Tagesstruktur, Vorhersehbarkeit, Reizverarbeitung, Nervensystem, Tagschlaf, Abendroutine, Nachtschlaf → Modul 3 – Struktur
+- Müdigkeitsfenster, Schlafbereitschaft, Einschlafzeitpunkt → Modul 4 – Schlafbereitschaft
+- Einschlafassoziationen, Federwiege, Schnuller, Gewohnheiten verändern → Modul 5 – Gewohnheiten verändern
+- Papa, Oma oder andere Bezugspersonen → Modul 6 – Bezugsperson
+
 Empfohlene Module mit Begründung (erscheinen automatisch als Karten unter der Analyse):
 
 ${moduleGuidance}
 
-Schreibe am Ende der Analyse für JEDES empfohlene Modul einzeln:
+Schreibe am Ende der Analyse:
 
 1. Fasse zuerst das Gesamtbild zusammen:
    "Ich glaube, ich habe inzwischen ein gutes Gesamtbild."
    "Mir fallen aktuell vor allem folgende Bereiche auf: …"
 
-2. Empfehle dann konkret und nummeriert nach Priorität, z. B.:
-   "Als Erstes würde ich dir das Modul [Modultitel] empfehlen – Schwerpunkt: [Fokus]."
+2. Gib 3–5 konkrete, individuelle Impulse und erste Empfehlungen auf Basis der Antworten – nummeriert und sofort hilfreich.
+
+3. Empfehle dann konkret und nummeriert nach Priorität – ausschließlich mit den offiziellen Modulnamen, z. B.:
+   "Als Erstes würde ich dir Modul 3 – Struktur empfehlen."
    Erkläre für jedes Modul:
    - warum genau dieses Modul zu den Antworten passt
    - welches Problem dadurch adressiert werden soll
    - warum es diese Priorität hat
 
-3. Wenn Strukturprobleme UND eine Einschlafhilfe (z. B. Federwiege) erkennbar sind:
-   Empfehle zuerst Schlafstruktur/Reizverarbeitung und erkläre ausdrücklich:
-   "Erst wenn die Schlafstruktur stabil ist, lohnt sich eine behutsame Veränderung der Federwiege."
+4. Wenn Strukturprobleme UND eine Einschlafhilfe (z. B. Federwiege) erkennbar sind:
+   Empfehle zuerst Modul 3 – Struktur und erkläre ausdrücklich:
+   "Erst wenn die Schlafstruktur stabil ist, lohnt sich eine behutsame Veränderung der Einschlafhilfe in Modul 5 – Gewohnheiten verändern."
 
-4. Gib 2–4 konkrete Handlungsschritte für HEUTE.
+5. Gib 2–4 konkrete Handlungsschritte für HEUTE.
 
-5. Nenne optional Kapitel, PDFs oder Übungen aus den empfohlenen Modulen.
+6. Nenne optional Kapitel, PDFs oder Übungen aus den empfohlenen Modulen.
 
 VERBOTEN:
+- Erfundene Modulbezeichnungen (z. B. "Schlafdruck und Wachzeiten", "Reizverarbeitung und Nervensystem")
 - "ein Angebot könnte passen"
 - "Genau deshalb könnte dieses Angebot …"
-- "Das passende Angebot findest du …"
 - Allgemeine Produkt- oder Kurswerbung
 
 Heutige Schritte als Orientierung (passe sie an die Familie an):

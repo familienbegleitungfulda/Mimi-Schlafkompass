@@ -3,7 +3,7 @@ import type { CourseModuleDefinition } from "./types";
 export const praktischeTippsModule: CourseModuleDefinition = {
   id: "praktische-tipps",
 
-  title: "Praktische Tipps für den Schlafalltag",
+  title: "Modul 7 – Praktische Tipps",
 
   description:
     "Dieses Modul enthält praktische Strategien für typische Schlafsituationen im Alltag – von Schlafankern über Pausen bis hin zu Notfalltipps.",
@@ -11,7 +11,7 @@ export const praktischeTippsModule: CourseModuleDefinition = {
   shortDescription:
     "Praktische Strategien für entspanntere Schlafsituationen.",
 
-  order: 8,
+  order: 7,
 
   recommendWhen: [
     "Die Familie sucht konkrete Alltagstipps.",

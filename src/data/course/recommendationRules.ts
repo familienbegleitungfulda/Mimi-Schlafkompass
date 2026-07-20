@@ -1,3 +1,5 @@
+import type { OfficialModuleId } from "./officialModules";
+
 export type AnalysisSignal =
   | "causeSleepPressure"
   | "causeOverstimulation"
@@ -16,10 +18,13 @@ export type AnalysisSignal =
   | "health"
   | "familyBurden"
   | "sleepReadiness"
-  | "caregivers";
+  | "caregivers"
+  | "developmentQuestions"
+  | "practicalTips"
+  | "acuteCrisis";
 
 export interface ModuleMatchRule {
-  moduleId: string;
+  moduleId: OfficialModuleId;
   signals: AnalysisSignal[];
   keywords?: string[];
   score: number;
@@ -30,12 +35,20 @@ export interface ModuleMatchRule {
 
 export const MIN_MODULE_SCORE = 6;
 
-export const defaultModuleIds = ["struktur", "reizverarbeitung"];
+export const defaultModuleIds: OfficialModuleId[] = ["struktur", "grundlagen"];
 
 export const moduleMatchRules: ModuleMatchRule[] = [
   {
     moduleId: "struktur",
-    signals: ["structureIssues", "causeSleepPressure", "sleepReadiness"],
+    signals: [
+      "structureIssues",
+      "causeSleepPressure",
+      "causeOverstimulation",
+      "nervousSystemIssues",
+      "napIssues",
+      "bedtimeRoutine",
+      "nightWakeups",
+    ],
     keywords: [
       "struktur",
       "routine",
@@ -44,65 +57,36 @@ export const moduleMatchRules: ModuleMatchRule[] = [
       "übermüd",
       "unterforder",
       "schlafstruktur",
-    ],
-    score: 5,
-    minTotalScore: 5,
-  },
-  {
-    moduleId: "reizverarbeitung",
-    signals: ["nervousSystemIssues", "causeOverstimulation", "temperament"],
-    keywords: ["reiz", "überreiz", "nervensystem", "high need", "sensibel"],
-    score: 5,
-    minTotalScore: 5,
-  },
-  {
-    moduleId: "schlafdruck",
-    signals: ["structureIssues", "causeSleepPressure", "sleepReadiness"],
-    keywords: [
       "schlafdruck",
-      "wachzeit",
-      "wachphase",
-      "übermüdung",
-      "unterforderung",
-      "schlafbereitschaft",
+      "tagesstruktur",
+      "vorhersehbar",
+      "reiz",
+      "überreiz",
+      "nervensystem",
+      "tagschlaf",
+      "schläfchen",
+      "nap",
+      "abendroutine",
+      "nacht",
+      "aufwach",
     ],
-    score: 5,
-    minTotalScore: 6,
+    score: 4,
+    minTotalScore: 5,
   },
   {
     moduleId: "schlafbereitschaft",
     signals: ["sleepReadiness", "structureIssues"],
-    keywords: ["schlafbereitschaft", "müde", "übermüd", "unterforder"],
-    score: 4,
+    keywords: [
+      "schlafbereitschaft",
+      "müdigkeitsfenster",
+      "müde",
+      "übermüd",
+      "unterforder",
+      "einschlafzeitpunkt",
+      "schlafbereit",
+    ],
+    score: 5,
     minTotalScore: 5,
-  },
-  {
-    moduleId: "tagesstruktur",
-    signals: ["structureIssues", "causeSleepPressure"],
-    keywords: ["tagesstruktur", "vorhersehbar", "routine", "schlafstruktur"],
-    score: 4,
-    minTotalScore: 6,
-  },
-  {
-    moduleId: "tagschlaf",
-    signals: ["napIssues", "structureIssues"],
-    keywords: ["tagschlaf", "schläfchen", "nap", "kurz"],
-    score: 4,
-    minTotalScore: 6,
-  },
-  {
-    moduleId: "abendroutine",
-    signals: ["bedtimeRoutine", "bedtimeSupport"],
-    keywords: ["abendroutine", "einschlafen", "bettzeit", "abend"],
-    score: 4,
-    minTotalScore: 6,
-  },
-  {
-    moduleId: "nachtschlaf",
-    signals: ["nightWakeups", "nightSupport"],
-    keywords: ["nacht", "aufwachen", "wachphase"],
-    score: 4,
-    minTotalScore: 6,
   },
   {
     moduleId: "schlafassoziationen",
@@ -115,43 +99,81 @@ export const moduleMatchRules: ModuleMatchRule[] = [
       "assoziation",
       "tragen",
       "schnuller",
-      "immer",
+      "brust",
+      "still",
+      "flasche",
+      "gewohnheit",
+      "abgewöhn",
     ],
-    score: 4,
+    score: 5,
     excludeWhen: ["under6Months"],
     minTotalScore: 4,
   },
   {
-    moduleId: "einschlafbegleitung",
-    signals: [
-      "possibleAssociation",
-      "nightWakeups",
-      "structureIssues",
-      "familyBurden",
-    ],
-    keywords: ["assoziation", "belastend", "immer"],
-    score: 3,
-    excludeWhen: ["under6Months"],
-    requiredSignals: [
-      "possibleAssociation",
-      "nightWakeups",
-      "structureIssues",
-      "familyBurden",
-    ],
-    minTotalScore: 10,
-  },
-  {
     moduleId: "bezugspersonen",
     signals: ["caregivers"],
-    keywords: ["papa", "mama", "bezug", "wechsel"],
-    score: 4,
+    keywords: ["papa", "mama", "oma", "opa", "bezug", "wechsel", "bezugsperson"],
+    score: 5,
     minTotalScore: 4,
   },
   {
     moduleId: "grundlagen",
     signals: ["causeGeneral"],
-    keywords: ["verstehen", "mythen", "sids", "familienbett", "schlaftraining"],
+    keywords: [
+      "verstehen",
+      "mythen",
+      "sids",
+      "familienbett",
+      "schlaftraining",
+      "normal",
+      "grundlage",
+    ],
+    score: 4,
+    minTotalScore: 4,
+  },
+  {
+    moduleId: "schlafentwicklung",
+    signals: ["changes", "developmentQuestions"],
+    keywords: [
+      "entwicklung",
+      "regression",
+      "schlafentwicklung",
+      "schlaftyp",
+      "chronotyp",
+      "sprung",
+      "zahn",
+    ],
+    score: 4,
+    minTotalScore: 4,
+  },
+  {
+    moduleId: "praktische-tipps",
+    signals: ["practicalTips", "bedtimeRoutine"],
+    keywords: [
+      "schlafanker",
+      "abdunkeln",
+      "sinkflug",
+      "powernap",
+      "pause",
+      "alltagstipp",
+      "praktisch",
+    ],
     score: 3,
+    minTotalScore: 5,
+  },
+  {
+    moduleId: "notfalltipps",
+    signals: ["acuteCrisis", "familyBurden"],
+    keywords: [
+      "notfall",
+      "krise",
+      "nichts mehr",
+      "überfordert",
+      "erschöpft",
+      "akut",
+      "entlastung",
+    ],
+    score: 4,
     minTotalScore: 4,
   },
 ];

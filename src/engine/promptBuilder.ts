@@ -456,13 +456,13 @@ ${
   isCourse
     ? `Im Schlummerwerkstatt-Modus darfst du Module erst empfehlen, wenn das Gesamtbild vollständig ist.
 
-Empfehle IMMER konkrete Module aus der Schlummerwerkstatt – mit Modultitel, Fokus, Begründung, Problem und Priorität.
+Empfehle IMMER mit den offiziellen Modulnamen (Modul 1–8) – niemals erfundene Bezeichnungen wie "Schlafdruck und Wachzeiten".
 
 Empfehle Module nur, wenn mehrere Hinweise zusammenpassen – nicht bei einzelnen Beobachtungen.
 
-Bei Strukturproblemen UND Einschlafhilfe (z. B. Federwiege): zuerst Schlafstruktur/Reizverarbeitung, dann die Einschlafhilfe.
+Bei Strukturproblemen UND Einschlafhilfe (z. B. Federwiege): zuerst Modul 3 – Struktur, dann Modul 5 – Gewohnheiten verändern.
 
-VERBOTEN: "ein Angebot könnte passen", "Genau deshalb könnte dieses Angebot …", allgemeine Werbung.
+VERBOTEN: erfundene Modulnamen, "ein Angebot könnte passen", "Genau deshalb könnte dieses Angebot …", allgemeine Werbung.
 
 Vor jeder Modulempfehlung fasse das Gesamtbild zusammen:
 "Ich glaube, ich habe inzwischen ein gutes Gesamtbild."
@@ -546,24 +546,22 @@ ${
   recommendation.mode === "course"
     ? `Die Analyse erklärt mögliche Zusammenhänge auf Basis der gleichen Logik wie im öffentlichen Modus.
 
-Am Ende empfiehlst du konkrete Module der Schlummerwerkstatt – mit Begründung, Problem, Priorität und Fokus.
+Am Ende: zuerst 3–5 konkrete Impulse, dann Modulempfehlungen mit offiziellen Modulnamen (Modul 1–8).
 
 Du darfst Kapitel und Zeitmarken aus der Schlummerwerkstatt nennen.
 
-Verwende niemals allgemeine Angebots-Formulierungen.`
-    : `Die kostenlose Analyse erklärt ausschließlich mögliche Zusammenhänge.
+Verwende niemals erfundene Modulbezeichnungen oder allgemeine Angebots-Formulierungen.`
+    : `Die kostenlose Analyse erklärt mögliche Zusammenhänge.
 
-Du gibst niemals detaillierte Lösungen.
+Am Ende gibst du zuerst 3–5 konkrete, individuelle Impulse und erste Empfehlungen – nummeriert und sofort hilfreich.
 
-Du erklärst niemals Schritt-für-Schritt-Vorgehensweisen.
+Erst danach erklärst du kurz, warum das empfohlene Angebot diese Tipps ergänzen und vertiefen würde – nicht ersetzen.
 
-Du verrätst niemals Inhalte aus Mayas Kursen.
+Du gibst niemals detaillierte Schritt-für-Schritt-Vorgehensweisen aus Mayas Kursen.
 
-Du erklärst lediglich,
+Du erklärst lediglich, warum du einen Zusammenhang vermutest.
 
-warum du einen Zusammenhang vermutest.
-
-Die eigentliche Lösung findet ausschließlich im empfohlenen Angebot statt.`
+Die vertiefte Lösung findet im empfohlenen Angebot statt – die Tipps davor sollen aber bereits echten Mehrwert bieten.`
 }
 -----------------------------------------------------
 

@@ -3,7 +3,7 @@ import type { CourseModuleDefinition } from "./types";
 export const schlafentwicklungModule: CourseModuleDefinition = {
   id: "schlafentwicklung",
 
-  title: "Schlafentwicklung in den ersten 24 Monaten",
+  title: "Modul 2 – Entwicklung und Schlaftypen",
 
   description:
     "Dieses Modul erklärt die normale Schlafentwicklung in den ersten zwei Lebensjahren. Es zeigt, welche Veränderungen biologisch normal sind, warum Schlaf sich immer wieder verändert und weshalb sogenannte Schlafregressionen meist Entwicklungsschritte darstellen.",

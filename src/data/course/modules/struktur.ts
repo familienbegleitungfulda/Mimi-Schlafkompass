@@ -3,7 +3,7 @@ import type { CourseModuleDefinition } from "./types";
 export const strukturModule: CourseModuleDefinition = {
   id: "struktur",
 
-  title: "Struktur & Schlafvorbereitung",
+  title: "Modul 3 – Struktur",
 
   description:
     "Dieses Modul zeigt, wie Tagesstruktur, Routinen und Schlafvorbereitung den Babyschlaf unterstützen. Außerdem lernst du, Übermüdung und Überreizung zu erkennen und typische Strukturprobleme richtig einzuordnen.",

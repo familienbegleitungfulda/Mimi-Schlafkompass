@@ -3,7 +3,7 @@ import type { CourseModuleDefinition } from "./types";
 export const grundlagenModule: CourseModuleDefinition = {
   id: "grundlagen",
 
-  title: "Grundlagen des Babyschlafs",
+  title: "Modul 1 – Grundlagen Babyschlaf",
 
   description:
     "Dieses Modul vermittelt die biologischen Grundlagen des Babyschlafs. Es erklärt, warum Babys schlafen, wie sich der Schlaf entwickelt, warum nächtliches Erwachen normal ist, welche Empfehlungen zum sicheren Babyschlaf gelten und warum Schlaftraining aus bindungsorientierter Sicht nicht empfohlen wird.",

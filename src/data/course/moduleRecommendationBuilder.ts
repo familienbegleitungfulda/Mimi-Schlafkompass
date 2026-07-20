@@ -1,135 +1,145 @@
 import type { ResolvedCourseModule } from "./courseSelector";
+import {
+  getOfficialModuleTitle,
+  OFFICIAL_MODULE_TITLES,
+  type OfficialModuleId,
+} from "./officialModules";
 
 export interface ModuleRecommendationDetail {
-  focusTitle: string;
+  /** Interner Schwerpunkt – kein Modulname für Eltern */
+  topicHint: string;
   whyFits: string;
   problemSolved: string;
   priorityRank: number;
   priorityReason: string;
 }
 
-interface FocusMatcher {
-  moduleId: string;
+interface TopicMatcher {
+  moduleId: OfficialModuleId;
   keywords: string[];
-  focusTitle: string;
+  topicHint: string;
   problemSolved: string;
 }
 
-const FOCUS_MATCHERS: FocusMatcher[] = [
+const TOPIC_MATCHERS: TopicMatcher[] = [
   {
     moduleId: "schlafassoziationen",
     keywords: ["federwiege", "wippe", "wippt", "schaukel"],
-    focusTitle: "Federwiege liebevoll abgewöhnen",
+    topicHint: "Federwiege oder Bewegung beim Einschlafen",
     problemSolved:
       "Die Abhängigkeit von Bewegung beim Einschlafen und bei nächtlichen Übergängen behutsam reduzieren.",
   },
   {
     moduleId: "schlafassoziationen",
     keywords: ["brust", "still"],
-    focusTitle: "Stillen als Einschlafhilfe",
+    topicHint: "Stillen als Einschlafhilfe",
     problemSolved:
       "Verstehen, wann und wie sich eine Einschlafhilfe am Busen bindungsorientiert verändern lässt.",
   },
   {
     moduleId: "schlafassoziationen",
     keywords: ["flasche"],
-    focusTitle: "Flasche als Einschlafhilfe",
+    topicHint: "Flasche als Einschlafhilfe",
     problemSolved:
       "Die Rolle der Flasche beim Einschlafen einordnen und mögliche Veränderungen planen.",
   },
   {
     moduleId: "schlafassoziationen",
     keywords: ["tragen", "trag"],
-    focusTitle: "Tragen als Einschlafhilfe",
+    topicHint: "Tragen als Einschlafhilfe",
     problemSolved:
       "Die Abhängigkeit vom Tragen beim Einschlafen und nachts behutsam abbauen.",
   },
   {
     moduleId: "schlafassoziationen",
     keywords: ["schnuller"],
-    focusTitle: "Schnuller als Schlafanker",
+    topicHint: "Schnuller als Schlafanker",
     problemSolved:
       "Die Rolle des Schnullers beim Einschlafen und nachts verstehen und bei Bedarf anpassen.",
   },
   {
     moduleId: "struktur",
-    keywords: ["struktur", "routine", "wachzeit", "wachphase", "übermüd", "unterforder"],
-    focusTitle: "Schlafstruktur optimieren",
+    keywords: [
+      "schlafdruck",
+      "wachzeit",
+      "wachphase",
+      "übermüd",
+      "unterforder",
+    ],
+    topicHint: "Schlafdruck und Wachzeiten",
     problemSolved:
-      "Wachzeiten, Routinen und Tagesablauf so anpassen, dass ausreichend Schlafdruck und Vorhersehbarkeit entstehen.",
+      "Altersgerechten Schlafdruck durch passende Wachzeiten und Tagesstruktur schaffen.",
   },
   {
-    moduleId: "reizverarbeitung",
+    moduleId: "struktur",
+    keywords: ["tagesstruktur", "vorhersehbar", "routine", "struktur"],
+    topicHint: "Tagesstruktur und Vorhersehbarkeit",
+    problemSolved:
+      "Einen vorhersehbaren Tagesablauf aufbauen, der Schlaf und Wachphasen stützt.",
+  },
+  {
+    moduleId: "struktur",
     keywords: ["reiz", "überreiz", "nervensystem", "sensibel", "high need"],
-    focusTitle: "Reizverarbeitung & Nervensystem",
+    topicHint: "Reizverarbeitung und Nervensystem",
     problemSolved:
       "Reize dosieren und das Nervensystem regulieren, damit Einschlafen und Durchschlafen leichter werden.",
   },
   {
-    moduleId: "schlafdruck",
-    keywords: ["schlafdruck", "wachzeit", "schläfchen", "nap"],
-    focusTitle: "Schlafdruck aufbauen",
-    problemSolved:
-      "Altersgerechten Schlafdruck durch passende Wachzeiten und Tagschlaf schaffen.",
-  },
-  {
-    moduleId: "tagschlaf",
+    moduleId: "struktur",
     keywords: ["tagschlaf", "schläfchen", "nap", "kurz"],
-    focusTitle: "Tagschlaf stabilisieren",
+    topicHint: "Tagschlaf und Schläfchen",
     problemSolved:
       "Anzahl, Länge und Verteilung der Tagschläfchen so anpassen, dass der Nachtschlaf entlastet wird.",
   },
   {
-    moduleId: "nachtschlaf",
+    moduleId: "struktur",
     keywords: ["nacht", "aufwach", "wachphase"],
-    focusTitle: "Nachtschlaf verstehen",
+    topicHint: "Nächtliches Aufwachen",
     problemSolved:
       "Häufiges nächtliches Erwachen einordnen und gezielt begleiten.",
   },
   {
-    moduleId: "abendroutine",
+    moduleId: "struktur",
     keywords: ["abend", "routine", "einschlaf"],
-    focusTitle: "Abendroutine gestalten",
+    topicHint: "Abendroutine und Tagesstruktur",
     problemSolved:
-      "Eine beruhigende, vorhersehbare Abendroutine aufbauen, die den Übergang in den Schlaf erleichtert.",
+      "Eine beruhigende, vorhersehbare Abendroutine in den Tagesablauf einbetten.",
   },
   {
     moduleId: "schlafbereitschaft",
-    keywords: ["müde", "schlafbereit", "übermüd", "aktiv"],
-    focusTitle: "Schlafbereitschaft erkennen",
+    keywords: ["müde", "schlafbereit", "übermüd", "müdigkeitsfenster", "aktiv"],
+    topicHint: "Müdigkeitsfenster und Schlafbereitschaft",
     problemSolved:
       "Die richtigen Müdigkeitssignale erkennen und den Schlaf zum passenden Zeitpunkt beginnen.",
   },
   {
     moduleId: "bezugspersonen",
-    keywords: ["papa", "mama", "bezug", "wechsel"],
-    focusTitle: "Bezugspersonen & Schlaf",
+    keywords: ["papa", "mama", "oma", "opa", "bezug", "wechsel"],
+    topicHint: "Bezugspersonen beim Einschlafen",
     problemSolved:
       "Die Rolle verschiedener Bezugspersonen beim Einschlafen und nachts verstehen.",
   },
+  {
+    moduleId: "notfalltipps",
+    keywords: ["notfall", "krise", "nichts mehr", "überfordert", "erschöpft"],
+    topicHint: "Akute Schlafkrise",
+    problemSolved:
+      "Kurzfristige Entlastung und praktische Strategien für besonders schwierige Phasen.",
+  },
 ];
 
-const MODULE_PRIORITY_TIER: Record<string, number> = {
+const MODULE_PRIORITY_TIER: Record<OfficialModuleId, number> = {
   grundlagen: 10,
   schlafentwicklung: 10,
   struktur: 20,
-  schlafbereitschaft: 20,
-  schlafdruck: 20,
-  tagesstruktur: 20,
-  tagschlaf: 25,
-  reizverarbeitung: 25,
-  abendroutine: 30,
-  nachtschlaf: 30,
-  praktischeTipps: 30,
+  schlafbereitschaft: 25,
+  "praktische-tipps": 30,
   bezugspersonen: 35,
-  einschlafbegleitung: 40,
+  notfalltipps: 35,
   schlafassoziationen: 40,
 };
 
-const ASSOCIATION_MODULE_IDS = new Set([
-  "schlafassoziationen",
-  "einschlafbegleitung",
-]);
+const ASSOCIATION_MODULE_IDS = new Set<OfficialModuleId>(["schlafassoziationen"]);
 
 function collectIssueText(
   memory: Record<string, unknown>,
@@ -145,47 +155,48 @@ function collectIssueText(
     memory.wakeWindows,
     memory.nightWakeups,
     memory.temperament,
+    memory.caregivers,
   ]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
 }
 
-function findFocusMatcher(
+function findTopicMatcher(
   moduleId: string,
   issueText: string
-): FocusMatcher | undefined {
-  return FOCUS_MATCHERS.find(
+): TopicMatcher | undefined {
+  return TOPIC_MATCHERS.find(
     (matcher) =>
       matcher.moduleId === moduleId &&
       matcher.keywords.some((keyword) => issueText.includes(keyword))
   );
 }
 
-function defaultFocusTitle(module: ResolvedCourseModule): string {
+function defaultTopicHint(module: ResolvedCourseModule): string {
   return (
     module.primaryChapter?.title ??
     module.roadmap.chapters[0]?.title ??
-    module.title
+    "Inhalte dieses Moduls"
   );
 }
 
 function buildWhyFits(
   module: ResolvedCourseModule,
-  focusTitle: string,
+  topicHint: string,
   issueText: string,
   detectedIssues: string[]
 ): string {
   const relevantIssues = detectedIssues.slice(0, 3).join("; ");
   if (relevantIssues) {
-    return `Passt zu euren Angaben (${relevantIssues}) und adressiert im Modul „${module.title}“ konkret: ${focusTitle}.`;
+    return `Passt zu euren Angaben (${relevantIssues}). Im ${module.title} vertieft ihr: ${topicHint}.`;
   }
 
   if (issueText.trim()) {
-    return `Passt zu dem, was ihr beschrieben habt, und fokussiert auf: ${focusTitle}.`;
+    return `Passt zu dem, was ihr beschrieben habt. Schwerpunkt in ${module.title}: ${topicHint}.`;
   }
 
-  return `Passt zum Gesamtbild eurer Schlafsituation und vertieft: ${focusTitle}.`;
+  return `Passt zum Gesamtbild eurer Schlafsituation. Schwerpunkt in ${module.title}: ${topicHint}.`;
 }
 
 function buildPriorityReason(
@@ -195,18 +206,11 @@ function buildPriorityReason(
   isAssociationModule: boolean
 ): string {
   if (isAssociationModule && hasStructureModule && priorityRank > 1) {
-    return "Erst wenn Schlafstruktur und Reizverarbeitung stabil sind, lohnt sich eine behutsame Veränderung der Einschlafhilfe.";
+    return "Erst wenn die Schlafstruktur stabil ist, lohnt sich eine behutsame Veränderung der Einschlafhilfe.";
   }
 
-  if (
-    (module.id === "struktur" || module.id === "reizverarbeitung") &&
-    priorityRank === 1
-  ) {
-    return "Schlafstruktur und Reizverarbeitung sind fast immer die erste Stellschraube – sie wirken oft stärker als das Arbeiten an Einschlafhilfen.";
-  }
-
-  if (module.id === "schlafdruck" && priorityRank === 1) {
-    return "Ohne passenden Schlafdruck verbessern sich Einschlafen und Durchschlafen selten nachhaltig.";
+  if (module.id === "struktur" && priorityRank === 1) {
+    return "Schlafstruktur ist fast immer die erste Stellschraube – sie wirkt oft stärker als das Arbeiten an Einschlafhilfen.";
   }
 
   if (priorityRank === 1) {
@@ -221,7 +225,7 @@ function defaultProblemSolved(module: ResolvedCourseModule): string {
 }
 
 export function getModulePriorityTier(moduleId: string): number {
-  return MODULE_PRIORITY_TIER[moduleId] ?? 30;
+  return MODULE_PRIORITY_TIER[moduleId as OfficialModuleId] ?? 30;
 }
 
 export function enrichModuleRecommendations(
@@ -230,11 +234,7 @@ export function enrichModuleRecommendations(
   detectedIssues: string[]
 ): Array<ResolvedCourseModule & { recommendation: ModuleRecommendationDetail }> {
   const issueText = collectIssueText(memory, detectedIssues);
-  const hasStructureModule = modules.some((module) =>
-    ["struktur", "schlafdruck", "tagesstruktur", "reizverarbeitung"].includes(
-      module.id
-    )
-  );
+  const hasStructureModule = modules.some((module) => module.id === "struktur");
 
   const sorted = [...modules].sort(
     (a, b) => getModulePriorityTier(a.id) - getModulePriorityTier(b.id)
@@ -242,21 +242,23 @@ export function enrichModuleRecommendations(
 
   return sorted.map((module, index) => {
     const priorityRank = index + 1;
-    const focusMatcher = findFocusMatcher(module.id, issueText);
-    const focusTitle = focusMatcher?.focusTitle ?? defaultFocusTitle(module);
-    const isAssociationModule = ASSOCIATION_MODULE_IDS.has(module.id);
+    const topicMatcher = findTopicMatcher(module.id, issueText);
+    const topicHint = topicMatcher?.topicHint ?? defaultTopicHint(module);
+    const isAssociationModule = ASSOCIATION_MODULE_IDS.has(
+      module.id as OfficialModuleId
+    );
 
     return {
       ...module,
       primaryChapter:
         module.roadmap.chapters.find((chapter) =>
-          chapter.title.toLowerCase().includes(focusTitle.toLowerCase())
+          chapter.title.toLowerCase().includes(topicHint.toLowerCase())
         ) ?? module.primaryChapter,
       recommendation: {
-        focusTitle,
-        whyFits: buildWhyFits(module, focusTitle, issueText, detectedIssues),
+        topicHint,
+        whyFits: buildWhyFits(module, topicHint, issueText, detectedIssues),
         problemSolved:
-          focusMatcher?.problemSolved ?? defaultProblemSolved(module),
+          topicMatcher?.problemSolved ?? defaultProblemSolved(module),
         priorityRank,
         priorityReason: buildPriorityReason(
           module,
@@ -272,12 +274,16 @@ export function enrichModuleRecommendations(
 export function formatModuleRecommendationsForPrompt(
   modules: Array<ResolvedCourseModule & { recommendation: ModuleRecommendationDetail }>
 ): string {
-  return modules
-    .map((module) => {
+  const officialNames = Object.values(OFFICIAL_MODULE_TITLES).join(", ");
+
+  return [
+    `Erlaubte Modulnamen (ausschließlich diese im Fließtext verwenden): ${officialNames}`,
+    "",
+    ...modules.map((module) => {
       const { recommendation: rec } = module;
       return [
         `Priorität ${rec.priorityRank}: ${module.title}`,
-        `Fokus: ${rec.focusTitle}`,
+        `Thema aus den Antworten (interner Schwerpunkt – NICHT als Modulname nennen): ${rec.topicHint}`,
         `Warum es passt: ${rec.whyFits}`,
         `Welches Problem es löst: ${rec.problemSolved}`,
         `Warum diese Priorität: ${rec.priorityReason}`,
@@ -291,6 +297,10 @@ export function formatModuleRecommendationsForPrompt(
       ]
         .filter(Boolean)
         .join("\n");
-    })
-    .join("\n\n");
+    }),
+  ].join("\n\n");
+}
+
+export function getOfficialTitle(moduleId: string): string {
+  return getOfficialModuleTitle(moduleId) ?? moduleId;
 }

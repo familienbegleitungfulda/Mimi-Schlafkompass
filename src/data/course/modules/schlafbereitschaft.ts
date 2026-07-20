@@ -3,7 +3,7 @@ import type { CourseModuleDefinition } from "./types";
 export const schlafbereitschaftModule: CourseModuleDefinition = {
   id: "schlafbereitschaft",
 
-  title: "Schlafbereitschaft erkennen",
+  title: "Modul 4 – Schlafbereitschaft",
 
   description:
     "Dieses Modul hilft dabei zu erkennen, wann ein Kind wirklich schlafbereit ist. Es erklärt Müdigkeitsanzeichen, Wachzeiten, den Einfluss von Reizen und wie Wachphasen sinnvoll gestaltet werden können.",

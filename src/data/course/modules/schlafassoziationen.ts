@@ -3,7 +3,7 @@ import type { CourseModuleDefinition } from "./types";
 export const schlafassoziationenModule: CourseModuleDefinition = {
   id: "schlafassoziationen",
 
-  title: "Schlafassoziationen verstehen und verändern",
+  title: "Modul 5 – Gewohnheiten verändern",
 
   description:
     "In diesem Modul erfährst du, was Schlafassoziationen sind, wann sie überhaupt verändert werden sollten und welche bindungsorientierten Möglichkeiten es gibt, sie Schritt für Schritt anzupassen.",
@@ -11,7 +11,7 @@ export const schlafassoziationenModule: CourseModuleDefinition = {
   shortDescription:
     "Schlafassoziationen erkennen und bindungsorientiert verändern.",
 
-  order: 6,
+  order: 5,
 
   recommendWhen: [
     "Das Kind schläft nur an der Brust ein.",

@@ -3,7 +3,7 @@ import type { CourseModuleDefinition } from "./types";
 export const bezugspersonenModule: CourseModuleDefinition = {
   id: "bezugspersonen",
 
-  title: "Weitere Bezugspersonen integrieren",
+  title: "Modul 6 – Bezugsperson",
 
   description:
     "In diesem Modul lernst du, warum Kinder Bezugspersonen unterschiedlich bevorzugen, wie weitere Bezugspersonen Schritt für Schritt eingebunden werden können und wie Veränderungen bindungsorientiert gelingen.",
@@ -11,7 +11,7 @@ export const bezugspersonenModule: CourseModuleDefinition = {
   shortDescription:
     "Weitere Bezugspersonen bindungsorientiert in die Schlafbegleitung integrieren.",
 
-  order: 7,
+  order: 6,
 
   recommendWhen: [
     "Das Kind akzeptiert nur eine Bezugsperson beim Einschlafen.",

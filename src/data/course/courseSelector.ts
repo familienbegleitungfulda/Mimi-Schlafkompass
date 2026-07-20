@@ -69,12 +69,36 @@ function collectAnalysisSignals(
   if (memory.caregivers) signals.add("caregivers");
 
   if (
+    /entwicklung|regression|schlaftyp|chronotyp|sprung/.test(
+      `${memory.mainProblem ?? ""} ${memory.changes ?? ""} ${memory.development ?? ""}`.toLowerCase()
+    )
+  ) {
+    signals.add("developmentQuestions");
+  }
+
+  if (
+    /schlafanker|abdunkeln|sinkflug|powernap|pause|alltagstipp/.test(
+      `${memory.mainProblem ?? ""} ${memory.bedtimeRoutine ?? ""}`.toLowerCase()
+    )
+  ) {
+    signals.add("practicalTips");
+  }
+
+  if (
     memory.familyBurden ||
-    /belast|erschöpf|anstreng|nicht mehr|überford/.test(
+    /belast|erschöpf|anstreng|nicht mehr|überford|krise|akut|notfall/.test(
       `${memory.mainProblem ?? ""} ${memory.duration ?? ""}`.toLowerCase()
     )
   ) {
     signals.add("familyBurden");
+  }
+
+  if (
+    /krise|notfall|nichts mehr|akut|unerträglich/.test(
+      `${memory.mainProblem ?? ""} ${memory.duration ?? ""}`.toLowerCase()
+    )
+  ) {
+    signals.add("acuteCrisis");
   }
 
   return signals;
@@ -139,7 +163,17 @@ export function selectModuleIds(
     });
 
   if (ranked.length > 0) {
-    return ranked.slice(0, limit).map((entry) => entry.moduleId);
+    const seen = new Set<string>();
+    const unique: string[] = [];
+
+    for (const entry of ranked) {
+      if (seen.has(entry.moduleId)) continue;
+      seen.add(entry.moduleId);
+      unique.push(entry.moduleId);
+      if (unique.length >= limit) break;
+    }
+
+    return unique;
   }
 
   return defaultModuleIds.slice(0, Math.min(limit, defaultModuleIds.length));

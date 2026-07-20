@@ -12,6 +12,7 @@ import { schlafbereitschaftModule } from "./schlafbereitschaft";
 import { schlafassoziationenModule } from "./schlafassoziationen";
 import { bezugspersonenModule } from "./bezugspersonen";
 import { praktischeTippsModule } from "./praktische-tipps";
+import { notfalltippsModule } from "./notfalltipps";
 import type {
   CourseModule,
   CourseModuleDefinition,
@@ -26,6 +27,7 @@ export const allCourseModuleDefinitions: CourseModuleDefinition[] = [
   schlafbereitschaftModule,
   schlafdruckModule,
   praktischeTippsModule,
+  notfalltippsModule,
   bezugspersonenModule,
   schlafassoziationenModule,
   tagesstrukturModule,
