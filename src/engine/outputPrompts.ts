@@ -1,4 +1,6 @@
 import type { ModeRecommendation } from "./recommendationEngine";
+import { formatModuleRecommendationsForPrompt } from "../data/course/moduleRecommendationBuilder";
+import type { ResolvedCourseModule } from "../data/course";
 
 function formatDetectedIssues(recommendation: ModeRecommendation): string {
   return recommendation.detectedIssues.length > 0
@@ -62,51 +64,24 @@ Stelle dann ein bis zwei gezielte Rückfragen zu fehlenden Bereichen.
 `.trim();
   }
 
-  const moduleDetails = recommendation.modules
-    .map((module) => {
-      const chapter = module.primaryChapter;
-      const chapterLine = chapter
-        ? `Kapitel: ${chapter.title}${chapter.timestamp ? ` (${chapter.timestamp})` : ""}`
-        : "";
-
-      const pdfs =
-        module.roadmap.pdfs.length > 0
-          ? `PDFs: ${module.roadmap.pdfs.map((pdf) => pdf.title).join(", ")}`
-          : "";
-
-      const exercises =
-        module.roadmap.exercises.length > 0
-          ? `Übungen: ${module.roadmap.exercises.map((exercise) => exercise.title).join(", ")}`
-          : "";
-
-      const bonus =
-        module.roadmap.bonus.length > 0
-          ? `Bonus: ${module.roadmap.bonus.map((item) => item.title).join(", ")}`
-          : "";
-
-      return [
-        `Modul: ${module.title}`,
-        `Beschreibung: ${module.description}`,
-        chapterLine,
-        pdfs,
-        exercises,
-        bonus,
-      ]
-        .filter(Boolean)
-        .join("\n");
-    })
-    .join("\n\n");
+  const moduleGuidance = formatModuleRecommendationsForPrompt(
+    recommendation.modules as Array<
+      ResolvedCourseModule & {
+        recommendation: NonNullable<ResolvedCourseModule["recommendation"]>;
+      }
+    >
+  );
 
   return `
 MODUL-EMPFEHLUNG (Schlummerwerkstatt-Kurs-Modus)
 
 Die Familie hat bereits Zugang zur Schlummerwerkstatt.
 
-Verkaufe KEINE externen Kurse oder Produkte. Empfehle ausschließlich Module aus der Schlummerwerkstatt.
+Verkaufe KEINE externen Kurse oder Produkte. Empfehle ausschließlich konkrete Module aus der Schlummerwerkstatt.
 
-Empfohlene Module (erscheinen automatisch als Karten unter der Analyse):
+Empfohlene Module mit Begründung (erscheinen automatisch als Karten unter der Analyse):
 
-${moduleDetails}
+${moduleGuidance}
 
 Aus den Antworten erkannte Herausforderungen:
 
@@ -116,19 +91,21 @@ Anleitung für den Fließtext am Ende deiner Analyse:
 
 ${recommendation.guidance}
 
-VOR der Modulempfehlung IMMER zusammenfassen:
+PFLICHTFORMAT für die Modulempfehlung:
 
-"Ich glaube, ich habe inzwischen ein gutes Gesamtbild."
-"Mir fallen aktuell vor allem folgende Bereiche auf: …"
-"Deshalb würde ich dir zuerst diese Module empfehlen."
+1. Gesamtbild zusammenfassen.
+2. Für jedes Modul einzeln und nummeriert nach Priorität:
+   - Modultitel und konkreter Fokus (z. B. "Federwiege liebevoll abgewöhnen")
+   - Warum es zu den Antworten passt
+   - Welches Problem es lösen soll
+   - Warum es diese Priorität hat
+3. Bei Strukturproblemen + Einschlafhilfe: erst Struktur/Reizverarbeitung, dann Einschlafhilfe.
 
-WICHTIG:
-
-- Empfehle Module nur, wenn mehrere Hinweise zusammenpassen
-- Erkläre immer, warum genau diese Module passen – nicht nur Modulnamen nennen
-- Gib 2–4 konkrete Handlungsschritte für HEUTE
-- Nenne optional Kapitel, PDFs, Bonusmaterial oder Übungen
-- Modultitel dürfen im Fließtext genannt werden
+STRENG VERBOTEN:
+- "ein Angebot könnte passen"
+- "Genau deshalb könnte dieses Angebot …"
+- "Das passende Angebot findest du …"
+- Allgemeine Werbung statt konkreter Modulnamen
 `.trim();
 }
 
@@ -164,10 +141,10 @@ Analyse noch NICHT erlaubt.
 Nach der vollständigen Analyse:
 
 → Fasse zuerst das Gesamtbild zusammen.
-→ Nenne die wichtigsten Bereiche, die dir aufgefallen sind.
-→ Empfehle passende Module der Schlummerwerkstatt (siehe MODUL-EMPFEHLUNG) und erkläre warum.
+→ Empfehle konkrete Module der Schlummerwerkstatt – mit Modultitel, Fokus, Begründung, Problem und Priorität.
+→ Erkläre die Reihenfolge (z. B. erst Schlafstruktur, dann Federwiege).
 → Gib konkrete Handlungsschritte für heute.
-→ Verkaufe keine externen Kurse oder Produkte.
+→ Verwende KEINE allgemeinen Angebots-Formulierungen.
 → Beende die Antwort mit
 
 ### ANALYSE BEENDET ###

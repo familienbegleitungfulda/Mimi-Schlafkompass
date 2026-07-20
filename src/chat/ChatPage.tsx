@@ -350,8 +350,24 @@ Wie alt ist dein Kind aktuell?`,
                       fontWeight: 600,
                     }}
                   >
+                    {module.recommendation?.priorityRank
+                      ? `${module.recommendation.priorityRank}. `
+                      : ""}
                     {module.title}
                   </h3>
+
+                  {module.recommendation?.focusTitle && (
+                    <p
+                      style={{
+                        color: theme.goldAccent,
+                        fontSize: 15,
+                        fontWeight: 600,
+                        marginBottom: 12,
+                      }}
+                    >
+                      Fokus: {module.recommendation.focusTitle}
+                    </p>
+                  )}
 
                   <p
                     style={{
@@ -362,6 +378,29 @@ Wie alt ist dein Kind aktuell?`,
                   >
                     {module.description}
                   </p>
+
+                  {module.recommendation && (
+                    <div
+                      style={{
+                        fontSize: 14,
+                        lineHeight: 1.6,
+                        color: theme.bodyText,
+                        marginBottom: 16,
+                      }}
+                    >
+                      <p style={{ margin: "0 0 8px 0" }}>
+                        <strong>Warum:</strong> {module.recommendation.whyFits}
+                      </p>
+                      <p style={{ margin: "0 0 8px 0" }}>
+                        <strong>Ziel:</strong>{" "}
+                        {module.recommendation.problemSolved}
+                      </p>
+                      <p style={{ margin: 0 }}>
+                        <strong>Priorität:</strong>{" "}
+                        {module.recommendation.priorityReason}
+                      </p>
+                    </div>
+                  )}
 
                   <p
                     style={{

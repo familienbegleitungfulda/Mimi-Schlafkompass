@@ -42,6 +42,13 @@ export {
   selectModuleIds,
 } from "./courseSelector";
 
+export {
+  enrichModuleRecommendations,
+  formatModuleRecommendationsForPrompt,
+  getModulePriorityTier,
+} from "./moduleRecommendationBuilder";
+export type { ModuleRecommendationDetail } from "./moduleRecommendationBuilder";
+
 /** @deprecated Use ModuleTodayAction from `./modules` */
 export type TodayAction = import("./modules").ModuleTodayAction & {
   moduleId: string;

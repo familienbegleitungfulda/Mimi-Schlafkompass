@@ -455,12 +455,17 @@ ${
   isCourse
     ? `Im Schlummerwerkstatt-Modus darfst du Module erst empfehlen, wenn das Gesamtbild vollständig ist.
 
+Empfehle IMMER konkrete Module aus der Schlummerwerkstatt – mit Modultitel, Fokus, Begründung, Problem und Priorität.
+
 Empfehle Module nur, wenn mehrere Hinweise zusammenpassen – nicht bei einzelnen Beobachtungen.
+
+Bei Strukturproblemen UND Einschlafhilfe (z. B. Federwiege): zuerst Schlafstruktur/Reizverarbeitung, dann die Einschlafhilfe.
+
+VERBOTEN: "ein Angebot könnte passen", "Genau deshalb könnte dieses Angebot …", allgemeine Werbung.
 
 Vor jeder Modulempfehlung fasse das Gesamtbild zusammen:
 "Ich glaube, ich habe inzwischen ein gutes Gesamtbild."
-"Mir fallen aktuell vor allem folgende Bereiche auf: …"
-"Deshalb würde ich dir zuerst diese Module empfehlen."`
+"Mir fallen aktuell vor allem folgende Bereiche auf: …"`
     : ""
 }
 
@@ -517,13 +522,21 @@ Folgende Themen beantwortest du niemals ausführlich:
 
 - individuelle Schlaftrainings
 
-Erkläre lediglich,
+Erkläle lediglich,
 
 warum diese Themen wichtig sein könnten.
 
-Verweise anschließend auf das passende Angebot von Maya.
+${
+  isCourse
+    ? "Verweise anschließend auf das passende Modul in der Schlummerwerkstatt – niemals auf ein allgemeines Angebot."
+    : "Verweise anschließend auf das passende Angebot von Maya."
+}
 
-Bei Schlafassoziationen verweist du nur dann und nur vorsichtig auf Mayas Angebote – niemals mit Schritt-für-Schritt-Anleitung und niemals als erste Stellschraube.
+${
+  isCourse
+    ? "Bei Schlafassoziationen verweist du nur dann und nur vorsichtig auf Module der Schlummerwerkstatt – niemals mit Schritt-für-Schritt-Anleitung und niemals als erste Stellschraube."
+    : "Bei Schlafassoziationen verweist du nur dann und nur vorsichtig auf Mayas Angebote – niemals mit Schritt-für-Schritt-Anleitung und niemals als erste Stellschraube."
+}
 -----------------------------------------------------
 
 KOSTENLOSE ANALYSE
@@ -532,11 +545,11 @@ ${
   recommendation.mode === "course"
     ? `Die Analyse erklärt mögliche Zusammenhänge auf Basis der gleichen Logik wie im öffentlichen Modus.
 
-Am Ende gibst du konkrete Handlungsschritte für heute und verweist auf passende Module der Schlummerwerkstatt.
+Am Ende empfiehlst du konkrete Module der Schlummerwerkstatt – mit Begründung, Problem, Priorität und Fokus.
 
 Du darfst Kapitel und Zeitmarken aus der Schlummerwerkstatt nennen.
 
-Verkaufe keine externen Kurse oder Produkte.`
+Verwende niemals allgemeine Angebots-Formulierungen.`
     : `Die kostenlose Analyse erklärt ausschließlich mögliche Zusammenhänge.
 
 Du gibst niemals detaillierte Lösungen.

@@ -7,6 +7,11 @@ import {
   isUnder6Months,
 } from "../../engine/associationEngine";
 import {
+  enrichModuleRecommendations,
+  getModulePriorityTier,
+  type ModuleRecommendationDetail,
+} from "./moduleRecommendationBuilder";
+import {
   courseModuleMap,
   getRoadmapForModule,
   getTodayActionsForModule,
@@ -34,6 +39,7 @@ export interface ResolvedCourseModule {
   todayActions: string[];
   primaryChapter?: RoadmapChapter;
   roadmap: ModuleRoadmap;
+  recommendation?: ModuleRecommendationDetail;
 }
 
 function collectAnalysisSignals(
@@ -107,18 +113,30 @@ function scoreModuleByRules(
 export function selectModuleIds(
   memory: any,
   context: CourseSelectionContext,
-  limit = 3
+  limit = 4
 ): string[] {
   const signals = collectAnalysisSignals(memory, context);
-  const issueText = context.detectedIssues.join(" ").toLowerCase();
+  const issueText = [
+    ...context.detectedIssues,
+    memory.mainProblem,
+    memory.bedtimeSupport,
+    memory.nightSupport,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
 
   const ranked = moduleMatchRules
     .map((rule) => ({
       moduleId: rule.moduleId,
       score: scoreModuleByRules(rule, signals, issueText),
+      tier: getModulePriorityTier(rule.moduleId),
     }))
     .filter((entry) => entry.score > 0)
-    .sort((a, b) => b.score - a.score);
+    .sort((a, b) => {
+      if (a.tier !== b.tier) return a.tier - b.tier;
+      return b.score - a.score;
+    });
 
   if (ranked.length > 0) {
     return ranked.slice(0, limit).map((entry) => entry.moduleId);
@@ -158,5 +176,6 @@ export function buildCourseModuleRecommendation(
   if (!analysisReady) return [];
 
   const moduleIds = selectModuleIds(memory, context);
-  return resolveCourseModules(moduleIds);
+  const modules = resolveCourseModules(moduleIds);
+  return enrichModuleRecommendations(modules, memory, context.detectedIssues);
 }

@@ -1,6 +1,7 @@
 import type { AppMode } from "../config";
 import {
   buildCourseModuleRecommendation,
+  formatModuleRecommendationsForPrompt,
   getTodayActionTexts,
   type ResolvedCourseModule,
 } from "../data/course";
@@ -210,55 +211,63 @@ function buildCourseRecommendation(
     modules.map((module) => module.id)
   ).slice(0, 4);
 
-  const moduleList = modules
-    .map((module) => {
-      const chapter = module.primaryChapter;
-      const chapterLabel = chapter
-        ? `${chapter.title}${chapter.timestamp ? `, ${chapter.timestamp}` : ""}`
-        : module.roadmap.chapters[0]?.title ?? "";
-
-      const materials = [
-        module.roadmap.pdfs.length > 0
-          ? `PDF: ${module.roadmap.pdfs[0].title}`
-          : null,
-        module.roadmap.exercises.length > 0
-          ? `Übung: ${module.roadmap.exercises[0].title}`
-          : null,
-      ]
-        .filter(Boolean)
-        .join(" · ");
-
-      return `• ${module.title} (${chapterLabel}${materials ? ` · ${materials}` : ""}): ${module.description}`;
-    })
-    .join("\n");
+  const moduleGuidance =
+    modules.length > 0
+      ? formatModuleRecommendationsForPrompt(
+          modules as Array<
+            ResolvedCourseModule & {
+              recommendation: NonNullable<
+                ResolvedCourseModule["recommendation"]
+              >;
+            }
+          >
+        )
+      : "";
 
   return {
     mode: "course",
     ...context,
     modules,
     todaySteps,
-    courseFocus: modules.map((module) => module.title),
+    courseFocus: modules.map(
+      (module) =>
+        module.recommendation?.focusTitle ?? module.title
+    ),
     guidance: `
-Die Familie hat bereits Zugang zur Schlummerwerkstatt. Verkaufe KEINE Kurse oder externen Produkte.
+Die Familie hat bereits Zugang zur Schlummerwerkstatt. Verkaufe KEINE externen Kurse oder Produkte.
 
-Empfohlene Module (erscheinen automatisch als Karten unter der Analyse):
+Empfehle IMMER konkrete Module aus der Schlummerwerkstatt – niemals allgemein "ein Angebot" oder "etwas könnte passen".
 
-${moduleList}
+Empfohlene Module mit Begründung (erscheinen automatisch als Karten unter der Analyse):
 
-Schreibe am Ende der Analyse:
+${moduleGuidance}
 
-1. Fasse zuerst zusammen, z. B.:
+Schreibe am Ende der Analyse für JEDES empfohlene Modul einzeln:
+
+1. Fasse zuerst das Gesamtbild zusammen:
    "Ich glaube, ich habe inzwischen ein gutes Gesamtbild."
    "Mir fallen aktuell vor allem folgende Bereiche auf: …"
-   "Deshalb würde ich dir zuerst diese Module empfehlen."
 
-2. Erkläre in 2–4 Sätzen, warum genau diese Module zu den Antworten passen – mit Bezug auf die erkannten Herausforderungen.
+2. Empfehle dann konkret und nummeriert nach Priorität, z. B.:
+   "Als Erstes würde ich dir das Modul [Modultitel] empfehlen – Schwerpunkt: [Fokus]."
+   Erkläre für jedes Modul:
+   - warum genau dieses Modul zu den Antworten passt
+   - welches Problem dadurch adressiert werden soll
+   - warum es diese Priorität hat
 
-3. Gib 2–4 konkrete Handlungsschritte für HEUTE (aus den empfohlenen Modulen).
+3. Wenn Strukturprobleme UND eine Einschlafhilfe (z. B. Federwiege) erkennbar sind:
+   Empfehle zuerst Schlafstruktur/Reizverarbeitung und erkläre ausdrücklich:
+   "Erst wenn die Schlafstruktur stabil ist, lohnt sich eine behutsame Veränderung der Federwiege."
 
-4. Nenne optional Kapitel, PDFs, Bonusmaterial oder Übungen aus der Schlummerwerkstatt.
+4. Gib 2–4 konkrete Handlungsschritte für HEUTE.
 
-5. Verkaufe keine Kurse. Die Familie ist bereits in der Schlummerwerkstatt.
+5. Nenne optional Kapitel, PDFs oder Übungen aus den empfohlenen Modulen.
+
+VERBOTEN:
+- "ein Angebot könnte passen"
+- "Genau deshalb könnte dieses Angebot …"
+- "Das passende Angebot findest du …"
+- Allgemeine Produkt- oder Kurswerbung
 
 Heutige Schritte als Orientierung (passe sie an die Familie an):
 

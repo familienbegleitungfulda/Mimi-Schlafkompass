@@ -30,35 +30,57 @@ export interface ModuleMatchRule {
 
 export const MIN_MODULE_SCORE = 6;
 
-export const defaultModuleIds = ["grundlagen", "schlafdruck"];
+export const defaultModuleIds = ["struktur", "reizverarbeitung"];
 
 export const moduleMatchRules: ModuleMatchRule[] = [
   {
-    moduleId: "grundlagen",
-    signals: ["causeGeneral"],
-    keywords: ["verstehen", "mythen", "sids", "familienbett", "schlaftraining"],
-    score: 3,
-    minTotalScore: 4,
-  },
-  {
-    moduleId: "schlafdruck",
+    moduleId: "struktur",
     signals: ["structureIssues", "causeSleepPressure", "sleepReadiness"],
-    keywords: ["schlafdruck", "wachzeit", "wachphase", "übermüdung", "unterforderung", "schlafbereitschaft"],
+    keywords: [
+      "struktur",
+      "routine",
+      "wachzeit",
+      "wachphase",
+      "übermüd",
+      "unterforder",
+      "schlafstruktur",
+    ],
     score: 5,
-    minTotalScore: 6,
-  },
-  {
-    moduleId: "tagesstruktur",
-    signals: ["structureIssues", "causeSleepPressure"],
-    keywords: ["tagesstruktur", "vorhersehbar", "routine", "schlafstruktur"],
-    score: 4,
-    minTotalScore: 6,
+    minTotalScore: 5,
   },
   {
     moduleId: "reizverarbeitung",
     signals: ["nervousSystemIssues", "causeOverstimulation", "temperament"],
     keywords: ["reiz", "überreiz", "nervensystem", "high need", "sensibel"],
     score: 5,
+    minTotalScore: 5,
+  },
+  {
+    moduleId: "schlafdruck",
+    signals: ["structureIssues", "causeSleepPressure", "sleepReadiness"],
+    keywords: [
+      "schlafdruck",
+      "wachzeit",
+      "wachphase",
+      "übermüdung",
+      "unterforderung",
+      "schlafbereitschaft",
+    ],
+    score: 5,
+    minTotalScore: 6,
+  },
+  {
+    moduleId: "schlafbereitschaft",
+    signals: ["sleepReadiness", "structureIssues"],
+    keywords: ["schlafbereitschaft", "müde", "übermüd", "unterforder"],
+    score: 4,
+    minTotalScore: 5,
+  },
+  {
+    moduleId: "tagesstruktur",
+    signals: ["structureIssues", "causeSleepPressure"],
+    keywords: ["tagesstruktur", "vorhersehbar", "routine", "schlafstruktur"],
+    score: 4,
     minTotalScore: 6,
   },
   {
@@ -83,6 +105,23 @@ export const moduleMatchRules: ModuleMatchRule[] = [
     minTotalScore: 6,
   },
   {
+    moduleId: "schlafassoziationen",
+    signals: ["possibleAssociation", "bedtimeSupport", "nightSupport"],
+    keywords: [
+      "federwiege",
+      "wippe",
+      "bewegung",
+      "schaukel",
+      "assoziation",
+      "tragen",
+      "schnuller",
+      "immer",
+    ],
+    score: 4,
+    excludeWhen: ["under6Months"],
+    minTotalScore: 4,
+  },
+  {
     moduleId: "einschlafbegleitung",
     signals: [
       "possibleAssociation",
@@ -100,5 +139,19 @@ export const moduleMatchRules: ModuleMatchRule[] = [
       "familyBurden",
     ],
     minTotalScore: 10,
+  },
+  {
+    moduleId: "bezugspersonen",
+    signals: ["caregivers"],
+    keywords: ["papa", "mama", "bezug", "wechsel"],
+    score: 4,
+    minTotalScore: 4,
+  },
+  {
+    moduleId: "grundlagen",
+    signals: ["causeGeneral"],
+    keywords: ["verstehen", "mythen", "sids", "familienbett", "schlaftraining"],
+    score: 3,
+    minTotalScore: 4,
   },
 ];
