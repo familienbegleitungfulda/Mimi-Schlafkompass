@@ -2,7 +2,9 @@ import { useEffect, useRef, useState } from "react";
 import { askMimi } from "../services/openai";
 import type { Message } from "./conversation";
 import { products as allProducts } from "../data/products";
+import type { CourseModule } from "../data/courseModules";
 import ChatInput from "../components/ChatInput";
+import { isCourseMode, MODE } from "../config";
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -11,6 +13,9 @@ export default function ChatPage() {
 
   const [recommendedProducts, setRecommendedProducts] =
     useState<typeof allProducts>([]);
+  const [recommendedModules, setRecommendedModules] = useState<CourseModule[]>(
+    []
+  );
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -36,7 +41,7 @@ Wie alt ist dein Kind aktuell?`,
     bottomRef.current?.scrollIntoView({
       behavior: "smooth",
     });
-  }, [messages]);
+  }, [messages, recommendedProducts, recommendedModules]);
 
   async function sendMessage() {
     if (!input.trim() || loading) return;
@@ -61,6 +66,7 @@ Wie alt ist dein Kind aktuell?`,
         )
       ) {
         setRecommendedProducts(answer.products);
+        setRecommendedModules(answer.modules);
       }
 
       setMessages([
@@ -108,50 +114,50 @@ Wie alt ist dein Kind aktuell?`,
       </h1>
 
       <div
-  style={{
-    background: "white",
-    borderRadius: 14,
-    padding: "12px 16px",
-    marginBottom: 20,
-    border: "1px solid #e8e8e8",
-    boxShadow: "0 4px 10px rgba(0,0,0,.05)",
-  }}
->
-  <div
-    style={{
-      fontSize: 15,
-      fontWeight: 600,
-      marginBottom: 6,
-      color: "#333",
-    }}
-  >
-    Wichtiger Hinweis
-  </div>
+        style={{
+          background: "white",
+          borderRadius: 14,
+          padding: "12px 16px",
+          marginBottom: 20,
+          border: "1px solid #e8e8e8",
+          boxShadow: "0 4px 10px rgba(0,0,0,.05)",
+        }}
+      >
+        <div
+          style={{
+            fontSize: 15,
+            fontWeight: 600,
+            marginBottom: 6,
+            color: "#333",
+          }}
+        >
+          Wichtiger Hinweis
+        </div>
 
-  <div
-    style={{
-      fontSize: 13,
-      lineHeight: 1.5,
-      color: "#666",
-    }}
-  >
-    <p style={{ margin: "0 0 6px 0" }}>
-      <strong>Mimi ist Mayas virtuelle Assistentin.</strong> Sie erstellt
-      anhand deiner Angaben eine erste Einschätzung eurer Schlafsituation auf
-      Grundlage von Mayas Fachwissen.
-    </p>
+        <div
+          style={{
+            fontSize: 13,
+            lineHeight: 1.5,
+            color: "#666",
+          }}
+        >
+          <p style={{ margin: "0 0 6px 0" }}>
+            <strong>Mimi ist Mayas virtuelle Assistentin.</strong> Sie erstellt
+            anhand deiner Angaben eine erste Einschätzung eurer Schlafsituation auf
+            Grundlage von Mayas Fachwissen.
+          </p>
 
-    <p style={{ margin: "0 0 6px 0" }}>
-      Die Analyse dient ausschließlich der ersten Orientierung und ersetzt
-      keine individuelle Schlafberatung sowie keine medizinische Untersuchung.
-    </p>
+          <p style={{ margin: "0 0 6px 0" }}>
+            Die Analyse dient ausschließlich der ersten Orientierung und ersetzt
+            keine individuelle Schlafberatung sowie keine medizinische Untersuchung.
+          </p>
 
-    <p style={{ margin: 0 }}>
-      Bei gesundheitlichen Auffälligkeiten oder akuten Beschwerden wende dich
-      bitte an deine Kinderärztin oder deinen Kinderarzt.
-    </p>
-  </div>
-</div>
+          <p style={{ margin: 0 }}>
+            Bei gesundheitlichen Auffälligkeiten oder akuten Beschwerden wende dich
+            bitte an deine Kinderärztin oder deinen Kinderarzt.
+          </p>
+        </div>
+      </div>
 
       <div
         style={{
@@ -166,31 +172,18 @@ Wie alt ist dein Kind aktuell?`,
             key={index}
             style={{
               alignSelf:
-                message.role ===
-                "assistant"
+                message.role === "assistant"
                   ? "flex-start"
                   : "flex-end",
-
               background:
-                message.role ===
-                "assistant"
-                  ? "#ffffff"
-                  : "#A6BE95",
-
+                message.role === "assistant" ? "#ffffff" : "#A6BE95",
               color: "#333",
-
               padding: 20,
-
               borderRadius: 20,
-
               whiteSpace: "pre-wrap",
-
               maxWidth: 650,
-
               lineHeight: 1.8,
-
-              boxShadow:
-                "0 8px 20px rgba(0,0,0,.08)",
+              boxShadow: "0 8px 20px rgba(0,0,0,.08)",
             }}
           >
             {message.content}
@@ -211,12 +204,9 @@ Wie alt ist dein Kind aktuell?`,
         )}
 
         <div ref={bottomRef} />
-        {recommendedProducts.length > 0 && (
-          <div
-            style={{
-              marginTop: 30,
-            }}
-          >
+
+        {recommendedProducts.length > 0 && !isCourseMode() && (
+          <div style={{ marginTop: 30 }}>
             <h2
               style={{
                 color: "white",
@@ -227,12 +217,7 @@ Wie alt ist dein Kind aktuell?`,
               Das könnte euch jetzt weiterhelfen
             </h2>
 
-            <div
-              style={{
-                display: "grid",
-                gap: 18,
-              }}
-            >
+            <div style={{ display: "grid", gap: 18 }}>
               {recommendedProducts.map((product) => (
                 <div
                   key={product.id}
@@ -240,16 +225,10 @@ Wie alt ist dein Kind aktuell?`,
                     background: "white",
                     borderRadius: 20,
                     padding: 24,
-                    boxShadow:
-                      "0 10px 25px rgba(0,0,0,.08)",
+                    boxShadow: "0 10px 25px rgba(0,0,0,.08)",
                   }}
                 >
-                  <h3
-                    style={{
-                      marginTop: 0,
-                      color: "#3B3B3B",
-                    }}
-                  >
+                  <h3 style={{ marginTop: 0, color: "#3B3B3B" }}>
                     {product.title}
                   </h3>
 
@@ -264,42 +243,93 @@ Wie alt ist dein Kind aktuell?`,
                   </p>
 
                   <button
-                    onClick={() =>
-                      window.open(
-                        product.url,
-                        "_blank"
-                      )
-                    }
+                    onClick={() => window.open(product.url, "_blank")}
                     style={{
-                      background: "#9DB38E",
+                      width: "100%",
+                      background: "#A6BE95",
                       color: "white",
                       border: "none",
                       borderRadius: 14,
-                      padding:
-                        "14px 24px",
+                      padding: "16px",
                       fontSize: 16,
-                      fontWeight: 600,
+                      fontWeight: 700,
                       cursor: "pointer",
                     }}
                   >
-                   <button
-  onClick={() => window.open(product.url, "_blank")}
-  style={{
-    width: "100%",
-    background: "#A6BE95",
-    color: "white",
-    border: "none",
-    borderRadius: 14,
-    padding: "16px",
-    fontSize: 16,
-    fontWeight: 700,
-    cursor: "pointer",
-    marginTop: 18,
-  }}
->
-  Zum Angebot →
-</button>
+                    Zum Angebot →
                   </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {recommendedModules.length > 0 && isCourseMode() && (
+          <div style={{ marginTop: 30 }}>
+            <h2
+              style={{
+                color: "white",
+                textAlign: "center",
+                marginBottom: 20,
+              }}
+            >
+              Passende Module in der Schlummerwerkstatt
+            </h2>
+
+            <div style={{ display: "grid", gap: 18 }}>
+              {recommendedModules.map((module) => (
+                <div
+                  key={module.id}
+                  style={{
+                    background: "white",
+                    borderRadius: 20,
+                    padding: 24,
+                    boxShadow: "0 10px 25px rgba(0,0,0,.08)",
+                  }}
+                >
+                  <h3 style={{ marginTop: 0, color: "#3B3B3B" }}>
+                    {module.title}
+                  </h3>
+
+                  <p
+                    style={{
+                      color: "#666",
+                      lineHeight: 1.7,
+                      marginBottom: 12,
+                    }}
+                  >
+                    {module.description}
+                  </p>
+
+                  <p
+                    style={{
+                      color: "#888",
+                      fontSize: 14,
+                      marginBottom: 16,
+                    }}
+                  >
+                    {module.chapter}
+                    {module.timestamp ? ` · ${module.timestamp}` : ""}
+                  </p>
+
+                  <div
+                    style={{
+                      background: "#f7f7f7",
+                      borderRadius: 12,
+                      padding: 16,
+                    }}
+                  >
+                    <strong style={{ display: "block", marginBottom: 8 }}>
+                      Schritte für heute:
+                    </strong>
+                    <ul style={{ margin: 0, paddingLeft: 20 }}>
+                      {module.todayActions.map((action) => (
+                        <li key={action} style={{ marginBottom: 6 }}>
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               ))}
             </div>
@@ -313,6 +343,19 @@ Wie alt ist dein Kind aktuell?`,
         onSend={sendMessage}
         loading={loading}
       />
+
+      {import.meta.env.DEV && (
+        <p
+          style={{
+            color: "rgba(255,255,255,0.6)",
+            fontSize: 12,
+            textAlign: "center",
+            marginTop: 16,
+          }}
+        >
+          Modus: {MODE}
+        </p>
+      )}
     </main>
   );
 }

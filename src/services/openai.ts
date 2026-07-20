@@ -1,6 +1,8 @@
 import type { Message } from "../chat/conversation";
+import { MODE } from "../config";
 import { extractionPrompt } from "../engine/extractionPrompt";
-import { buildRecommendation } from "../engine/productEngine";
+import { buildRecommendation } from "../engine/recommendationEngine";
+import { buildAnalysisEndInstructions } from "../engine/outputPrompts";
 import { buildPrompt } from "../engine/promptBuilder";
 import { knowledge } from "../data/knowledge";
 import { ageKnowledge } from "../data/ageKnowledge";
@@ -14,6 +16,8 @@ import { conversationRules } from "../data/conversationRules";
 import { updateMemory } from "../engine/memoryEngine";
 import { sleepNeeds } from "../data/sleepNeeds";
 import { shouldAnalyse } from "../engine/reasoningEngine";
+import type { CourseModule } from "../data/courseModules";
+import { products } from "../data/products";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -41,7 +45,14 @@ async function chat(messages: any[]) {
   return response.json();
 }
 
-export async function askMimi(messages: Message[]) {
+export type MimiResponse = {
+  message: string;
+  products: (typeof products)[number][];
+  modules: CourseModule[];
+  mode: typeof MODE;
+};
+
+export async function askMimi(messages: Message[]): Promise<MimiResponse> {
   const extraction = await chat([
     {
       role: "system",
@@ -59,23 +70,27 @@ export async function askMimi(messages: Message[]) {
   } catch {
     extracted = {};
   }
-  
+
   const previousMemory =
     (globalThis as any).__mimiMemory ?? {};
-  
+
   const memory = updateMemory(
     previousMemory,
     extracted
   );
-  
+
   (globalThis as any).__mimiMemory = memory;
   const reasoning = shouldAnalyse(memory);
 
-  const recommendation = buildRecommendation(memory);
+  const recommendation = buildRecommendation(memory, MODE);
 
-  const products = recommendation.product
-    ? [recommendation.product]
-    : [];
+  const products =
+    recommendation.mode === "public" && recommendation.product
+      ? [recommendation.product]
+      : [];
+
+  const modules =
+    recommendation.mode === "course" ? recommendation.modules : [];
 
   const prompt = `
 ${knowledge}
@@ -117,21 +132,15 @@ Wenn Analyse erlaubt = NEIN
 
 → Schreibe KEINE Analyse.
 
-→ Empfiehl KEIN Produkt.
+→ Empfiehl KEIN Produkt und keine Module.
 
 → Stelle genau EINE weitere Rückfrage.
 
 Wenn Analyse erlaubt = JA
 
-→ Erstelle die Analyse.
+→ Erstelle die Analyse (gleiche Logik wie immer).
 
-→ Schreibe am Ende 2–4 personalisierte Sätze zur Produktempfehlung (ohne Kursnamen – siehe PRODUKTEMPFEHLUNG).
-
-→ Nenne im Fließtext NIEMALS einen Kursnamen oder Produkttitel.
-
-→ Beende die Antwort mit
-
-### ANALYSE BEENDET ###
+${buildAnalysisEndInstructions(recommendation)}
   `;
 
   const response = await chat([
@@ -145,5 +154,7 @@ Wenn Analyse erlaubt = JA
   return {
     message: response.choices[0].message.content ?? "",
     products,
+    modules,
+    mode: MODE,
   };
 }

@@ -1,11 +1,12 @@
 import { getFollowUpQuestion } from "./followUpEngine";
 import { buildHypotheses } from "./hypothesisEngine";
 import { shouldAnalyse } from "./reasoningEngine";
-import type { Recommendation } from "./productEngine";
+import type { ModeRecommendation } from "./recommendationEngine";
+import { buildModeOutputPrompt } from "./outputPrompts";
 
 export function buildPrompt(
     memory:any,
-    recommendation: Recommendation
+    recommendation: ModeRecommendation
 ) {
   const hypotheses = buildHypotheses(memory);
   const reasoning = shouldAnalyse(memory);
@@ -515,7 +516,16 @@ Bei Schlafassoziationen verweist du nur dann und nur vorsichtig auf Mayas Angebo
 
 KOSTENLOSE ANALYSE
 
-Die kostenlose Analyse erklärt ausschließlich mögliche Zusammenhänge.
+${
+  recommendation.mode === "course"
+    ? `Die Analyse erklärt mögliche Zusammenhänge auf Basis der gleichen Logik wie im öffentlichen Modus.
+
+Am Ende gibst du konkrete Handlungsschritte für heute und verweist auf passende Module der Schlummerwerkstatt.
+
+Du darfst Kapitel und Zeitmarken aus der Schlummerwerkstatt nennen.
+
+Verkaufe keine externen Kurse oder Produkte.`
+    : `Die kostenlose Analyse erklärt ausschließlich mögliche Zusammenhänge.
 
 Du gibst niemals detaillierte Lösungen.
 
@@ -527,42 +537,12 @@ Du erklärst lediglich,
 
 warum du einen Zusammenhang vermutest.
 
-Die eigentliche Lösung findet ausschließlich im empfohlenen Angebot statt.
+Die eigentliche Lösung findet ausschließlich im empfohlenen Angebot statt.`
+}
 -----------------------------------------------------
 
 
-PRODUKTEMPFEHLUNG
-
-Unter deiner Antwort erscheint automatisch genau EIN Angebot als Produktkarte.
-
-Das empfohlene Angebot (NUR für dein Wissen – NIEMALS im Fließtext nennen):
-
-Titel: ${recommendation.product?.title ?? "–"}
-Beschreibung: ${recommendation.product?.description ?? "–"}
-Schwerpunkte: ${recommendation.courseFocus.join(", ")}
-
-Aus den Antworten erkannte Herausforderungen:
-
-${recommendation.detectedIssues.length > 0
-  ? recommendation.detectedIssues.map((issue) => `• ${issue}`).join("\n")
-  : "• Keine spezifischen Hinweise"}
-
-Anleitung für den Fließtext am Ende deiner Analyse:
-
-${recommendation.guidance}
-
-WICHTIG – NIEMALS im Fließtext:
-
-- Keinen Kursnamen nennen (z. B. Schlummerwerkstatt, Mini-Kurs, Schlafbasis, Struktur & Überreizung)
-- Keinen Produkttitel nennen
-- Keine Formulierung wie "Ich empfehle dir den Kurs..."
-- Titel und Beschreibung des Angebots nicht wiederholen – die Produktkarte darunter zeigt das automatisch
-
-Der konkrete Produktname erscheint ausschließlich in der Produktkarte unter der Analyse.
-
-Schreibe keine allgemeine Werbebeschreibung. Beziehe dich immer auf die individuellen Antworten der Familie.
-
-Verkaufe nicht. Erkläre den persönlichen Bezug.
+${buildModeOutputPrompt(recommendation)}
 
 -----------------------------------------------------
 
@@ -597,7 +577,7 @@ Du fragst niemals:
 - Hast du noch Fragen?
 - Worüber möchtest du noch mehr wissen?
 
-Nach der Produktempfehlung endet die Antwort.
+Nach der Produktempfehlung oder Modulempfehlung endet die Antwort.
 
 Die LETZTE Zeile deiner Antwort lautet immer exakt:
 
