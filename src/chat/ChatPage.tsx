@@ -84,7 +84,7 @@ Wie alt ist dein Kind aktuell?`,
         },
       ]);
     } catch (error) {
-      console.error(error);
+      console.error("askMimi failed:", error);
 
       setMessages([
         ...history,

@@ -2,9 +2,12 @@
   command = "npm run build"
   publish = "dist"
 
-# Mode is resolved automatically:
-# - build time: vite.config.ts reads Netlify URL (schlummerwerkstatt → course)
-# - runtime: src/config.ts reads window.location.hostname
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# OpenAI requests go through /.netlify/functions/chat in production.
+# Set OPENAI_API_KEY or VITE_OPENAI_API_KEY in Netlify environment variables.
 
 [[redirects]]
   from = "/*"

@@ -18,33 +18,54 @@ import { sleepNeeds } from "../data/sleepNeeds";
 import { shouldAnalyse } from "../engine/reasoningEngine";
 import type { ResolvedCourseModule } from "../data/course";
 import { products } from "../data/products";
-import { courseKnowledgeBase } from "../data/course";
-import { courseModules } from "../data/course";
+import { courseKnowledgeBase, courseModules } from "../data/course";
 
-const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
+const DEV_API_KEY = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
 
-async function chat(messages: any[]) {
-  const response = await fetch(
-    "https://api.openai.com/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        temperature: 0.4,
-        messages,
-      }),
+/** Production uses Netlify Function so the key is read at runtime on the server. */
+const CHAT_ENDPOINT = import.meta.env.PROD
+  ? "/.netlify/functions/chat"
+  : "https://api.openai.com/v1/chat/completions";
+
+async function chat(messages: Message[] | { role: string; content: string }[]) {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+
+  if (!import.meta.env.PROD) {
+    if (!DEV_API_KEY) {
+      throw new Error(
+        "Missing VITE_OPENAI_API_KEY in .env for local development."
+      );
     }
-  );
+    headers.Authorization = `Bearer ${DEV_API_KEY}`;
+  }
+
+  const response = await fetch(CHAT_ENDPOINT, {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      model: "gpt-4.1-mini",
+      temperature: 0.4,
+      messages,
+    }),
+  });
 
   if (!response.ok) {
     throw new Error(await response.text());
   }
 
   return response.json();
+}
+
+function buildCoursePromptSection(): string {
+  return `
+${courseKnowledgeBase}
+
+Verfügbare Kursmodule:
+
+${JSON.stringify(courseModules, null, 2)}
+  `.trim();
 }
 
 export type MimiResponse = {
@@ -58,52 +79,45 @@ export async function askMimi(messages: Message[]): Promise<MimiResponse> {
   const mode = resolveAppMode();
 
   const extraction = await chat([
-    {
-      role: "system",
-      content: extractionPrompt,
-    },
+    { role: "system", content: extractionPrompt },
     ...messages,
   ]);
 
-  let extracted: any = {};
+  let extracted: Record<string, unknown> = {};
 
   try {
-    extracted = JSON.parse(
-      extraction.choices[0].message.content
-    );
+    extracted = JSON.parse(extraction.choices[0].message.content);
   } catch {
     extracted = {};
   }
 
   const previousMemory =
-    (globalThis as any).__mimiMemory ?? {};
+    (globalThis as Record<string, unknown>).__mimiMemory ?? {};
 
-  const memory = updateMemory(
-    previousMemory,
-    extracted
-  );
+  const memory = updateMemory(previousMemory, extracted);
+  (globalThis as Record<string, unknown>).__mimiMemory = memory;
 
-  (globalThis as any).__mimiMemory = memory;
   const reasoning = shouldAnalyse(memory, mode);
-
   const recommendation = buildRecommendation(memory, mode, reasoning.ready);
 
-  const products =
+  const recommendedProducts =
     recommendation.mode === "public" &&
     reasoning.ready &&
     recommendation.product
       ? [recommendation.product]
       : [];
 
-  const modules =
+  const recommendedModules =
     recommendation.mode === "course" && reasoning.ready
       ? recommendation.modules
       : [];
 
+  const courseSection = mode === "course" ? buildCoursePromptSection() : "";
+
   const prompt = `
 ${knowledge}
 
-${courseKnowledgeBase}
+${courseSection}
 
 ${mayaKnowledge}
 
@@ -123,10 +137,6 @@ ${ageKnowledge}
 
 ${redFlags}
 
-Verfügbare Kursmodule:
-
-${JSON.stringify(courseModules, null, 2)}
-
 ${buildPrompt(memory, recommendation, reasoning.ready)}
 
 WICHTIG
@@ -140,20 +150,17 @@ Fehlende Informationen:
 ${reasoning.missing.join(", ") || "keine"}
 
 ${buildAnalysisEndInstructions(recommendation, reasoning.ready)}
-  `;
+  `.trim();
 
   const response = await chat([
-    {
-      role: "system",
-      content: prompt,
-    },
+    { role: "system", content: prompt },
     ...messages,
   ]);
 
   return {
     message: response.choices[0].message.content ?? "",
-    products,
-    modules,
+    products: recommendedProducts,
+    modules: recommendedModules,
     mode,
   };
 }
