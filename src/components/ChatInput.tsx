@@ -1,10 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
+import type { MimiTheme } from "../theme";
 
 type Props = {
   value: string;
   onChange: (value: string) => void;
   onSend: () => void;
   loading?: boolean;
+  theme: MimiTheme;
 };
 
 const MIN_ROWS = 2;
@@ -15,6 +17,7 @@ export default function ChatInput({
   onChange,
   onSend,
   loading,
+  theme,
 }: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -63,13 +66,21 @@ export default function ChatInput({
           flex: 1,
           padding: 18,
           borderRadius: 16,
-          border: "1px solid #DDD",
+          border: `1px solid ${theme.inputBorder}`,
           fontSize: 16,
           lineHeight: 1.5,
           fontFamily: "inherit",
           resize: "none",
           boxSizing: "border-box",
           overflowY: "hidden",
+          background: theme.sectionBackground,
+          color: theme.bodyText,
+        }}
+        onFocus={(e) => {
+          e.currentTarget.style.borderColor = theme.inputFocusBorder;
+        }}
+        onBlur={(e) => {
+          e.currentTarget.style.borderColor = theme.inputBorder;
         }}
       />
 
@@ -77,15 +88,24 @@ export default function ChatInput({
         onClick={onSend}
         disabled={loading}
         style={{
-          background: "#9DB38E",
+          background: theme.accent,
           color: "white",
           border: "none",
           borderRadius: 16,
           padding: "18px 28px",
-          cursor: "pointer",
+          cursor: loading ? "default" : "pointer",
           fontSize: 16,
           fontWeight: 600,
           alignSelf: "flex-end",
+          opacity: loading ? 0.7 : 1,
+        }}
+        onMouseEnter={(e) => {
+          if (!loading) {
+            e.currentTarget.style.background = theme.accentHover;
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.background = theme.accent;
         }}
       >
         {loading ? "..." : "Senden"}

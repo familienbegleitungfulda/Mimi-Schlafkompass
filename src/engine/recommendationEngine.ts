@@ -200,9 +200,12 @@ Beende mit: "Das passende Angebot findest du direkt unter dieser Analyse."
   };
 }
 
-function buildCourseRecommendation(memory: any): CourseRecommendation {
+function buildCourseRecommendation(
+  memory: any,
+  analysisReady: boolean
+): CourseRecommendation {
   const context = buildAnalysisContext(memory);
-  const modules = buildCourseModuleRecommendation(memory, context);
+  const modules = buildCourseModuleRecommendation(memory, context, analysisReady);
   const todaySteps = getTodayActionTexts(
     modules.map((module) => module.id)
   ).slice(0, 4);
@@ -244,10 +247,18 @@ ${moduleList}
 
 Schreibe am Ende der Analyse:
 
-1. Erkläre in 2–4 Sätzen, warum genau diese Module zu den Antworten der Familie passen – mit Bezug auf die erkannten Herausforderungen.
-2. Gib 2–4 konkrete Handlungsschritte für HEUTE (aus den empfohlenen Modulen).
-3. Nenne optional Kapitel, PDFs, Bonusmaterial oder Übungen aus der Schlummerwerkstatt.
-4. Verkaufe keine Kurse. Die Familie ist bereits in der Schlummerwerkstatt.
+1. Fasse zuerst zusammen, z. B.:
+   "Ich glaube, ich habe inzwischen ein gutes Gesamtbild."
+   "Mir fallen aktuell vor allem folgende Bereiche auf: …"
+   "Deshalb würde ich dir zuerst diese Module empfehlen."
+
+2. Erkläre in 2–4 Sätzen, warum genau diese Module zu den Antworten passen – mit Bezug auf die erkannten Herausforderungen.
+
+3. Gib 2–4 konkrete Handlungsschritte für HEUTE (aus den empfohlenen Modulen).
+
+4. Nenne optional Kapitel, PDFs, Bonusmaterial oder Übungen aus der Schlummerwerkstatt.
+
+5. Verkaufe keine Kurse. Die Familie ist bereits in der Schlummerwerkstatt.
 
 Heutige Schritte als Orientierung (passe sie an die Familie an):
 
@@ -258,10 +269,11 @@ ${todaySteps.map((step) => `• ${step}`).join("\n")}
 
 export function buildRecommendation(
   memory: any,
-  mode: AppMode
+  mode: AppMode,
+  analysisReady = false
 ): ModeRecommendation {
   if (mode === "course") {
-    return buildCourseRecommendation(memory);
+    return buildCourseRecommendation(memory, analysisReady);
   }
 
   return buildPublicRecommendation(memory);

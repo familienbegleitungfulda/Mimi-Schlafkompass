@@ -1,29 +1,80 @@
-export function shouldAnalyse(memory: any) {
-    const required = [
-      "age",
-      "mainProblem",
-      "duration",
-      "bedtime",
-      "bedtimeRoutine",
-      "bedtimeSupport",
-      "napCount",
-      "daySleepTotal",
-      "wakeWindows",
-      "nightWakeups",
-      "nightSupport",
-      "sleepPlace",
-      "feeding",
-      "health",
-      "temperament",
-      "changes",
-    ];
-  
-    const missing = required.filter(
-      (key) => !memory[key]
-    );
-  
+import type { AppMode } from "../config";
+
+export interface AnalysisArea {
+  keys: string[];
+  label: string;
+}
+
+export const ANALYSIS_AREAS: AnalysisArea[] = [
+  { keys: ["age"], label: "Alter des Kindes" },
+  { keys: ["mainProblem"], label: "Hauptproblem" },
+  { keys: ["naps", "napCount"], label: "Tagschlaf – Anzahl" },
+  { keys: ["napLength"], label: "Tagschlaf – Dauer" },
+  { keys: ["bedtimeDuration"], label: "Einschlafdauer" },
+  { keys: ["nightWakeups"], label: "Häufigkeit des nächtlichen Erwachens" },
+  { keys: ["bedtime"], label: "Nachtschlaf – Uhrzeiten" },
+  { keys: ["wakeWindows"], label: "Wachzeiten" },
+  { keys: ["sleepReadiness"], label: "Schlafbereitschaft" },
+  { keys: ["light", "noise", "sleepPlace"], label: "Schlafumgebung" },
+  { keys: ["bedtimeSupport"], label: "Einschlafhilfe" },
+  { keys: ["nightSupport"], label: "Hilfe nachts" },
+  { keys: ["feeding"], label: "Nachtnahrung / Ernährung" },
+  { keys: ["changes", "development"], label: "Entwicklung / Veränderungen" },
+  { keys: ["health"], label: "Gesundheit" },
+  { keys: ["temperament"], label: "Temperament" },
+  { keys: ["caregivers"], label: "Bezugspersonen" },
+  { keys: ["duration"], label: "Seit wann das Problem besteht" },
+  { keys: ["bedtimeRoutine"], label: "Abendroutine" },
+  { keys: ["familyBurden"], label: "Belastung der Familie" },
+];
+
+function hasArea(memory: Record<string, unknown>, area: AnalysisArea): boolean {
+  return area.keys.some((key) => {
+    const value = memory[key];
+    return value !== undefined && value !== null && value !== "";
+  });
+}
+
+export function getMissingAreas(memory: Record<string, unknown>): string[] {
+  return ANALYSIS_AREAS.filter((area) => !hasArea(memory, area)).map(
+    (area) => area.label
+  );
+}
+
+export function shouldAnalyse(memory: Record<string, unknown>, mode: AppMode = "public") {
+  const missing = getMissingAreas(memory);
+
+  if (mode === "course") {
     return {
-      ready: missing.length <= 1,
+      ready: missing.length === 0,
       missing,
     };
   }
+
+  return {
+    ready: missing.length <= 2,
+    missing,
+  };
+}
+
+export const ANALYSIS_ORDER_PROMPT = `
+INTERNE ANALYSE-REIHENFOLGE
+
+Denke immer ungefähr in dieser Reihenfolge:
+
+1. Alter
+2. Entwicklung
+3. Gesundheit
+4. Schlafmenge (Tagschlaf + Nachtschlaf)
+5. Wachzeiten
+6. Schlafbereitschaft
+7. Struktur
+8. Reizverarbeitung
+9. Schlafassoziationen – erst ganz am Ende und nur zurückhaltend
+10. Bezugspersonen
+11. Schlafumgebung
+12. Ernährung
+
+Springe nicht sofort auf Schlafassoziationen.
+Empfehle nicht sofort Module oder Produkte.
+`.trim();

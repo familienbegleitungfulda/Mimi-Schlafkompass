@@ -48,6 +48,12 @@ Schema:
 "sleepPlace":"",
 
 "feeding":"",
+"nightFeeding":"",
+
+"sleepReadiness":"",
+"caregivers":"",
+"development":"",
+"familyBurden":"",
 
 "light":"",
 "noise":"",

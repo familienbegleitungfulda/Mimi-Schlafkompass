@@ -1,158 +1,131 @@
+import { getMissingAreas } from "./reasoningEngine";
 import { followUps } from "../data/followUps";
 
 function random(list: string[]) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-export function getFollowUpQuestion(memory: any) {
-  if (!memory.age) {
-    return "Wie alt ist dein Kind genau?";
-  }
+const areaQuestions: Record<string, string[]> = {
+  "Alter des Kindes": ["Wie alt ist dein Kind genau?"],
+  Hauptproblem: ["Was belastet euch aktuell beim Schlaf am meisten?"],
+  "Tagschlaf – Anzahl": [
+    "Wie viele Schläfchen macht dein Kind tagsüber?",
+  ],
+  "Tagschlaf – Dauer": [
+    "Wie lange dauern die einzelnen Schläfchen ungefähr?",
+  ],
+  Einschlafdauer: [
+    "Wie lange dauert das Einschlafen ungefähr?",
+  ],
+  "Häufigkeit des nächtlichen Erwachens": [
+    "Wie oft wacht dein Kind nachts ungefähr auf?",
+  ],
+  "Nachtschlaf – Uhrzeiten": [
+    "Um wie viel Uhr geht dein Kind abends ins Bett und wann steht es morgens auf?",
+  ],
+  Wachzeiten: [
+    "Wie lange ist dein Kind morgens wach, bevor es das erste Schläfchen macht?",
+  ],
+  Schlafbereitschaft: [
+    "Wie merkt ihr, wann euer Kind müde genug zum Schlafen ist?",
+    "Wirkt dein Kind abends eher übermüdet oder noch recht aktiv?",
+  ],
+  Schlafumgebung: [
+    "Wo schläft dein Kind nachts und wie ist das Schlafzimmer eingerichtet?",
+    "Ist das Schlafzimmer abgedunkelt und gibt es Hintergrundgeräusche?",
+  ],
+  Einschlafhilfe: [
+    "Wie begleitet ihr dein Kind beim Einschlafen abends?",
+  ],
+  "Hilfe nachts": [
+    "Was macht ihr, wenn dein Kind nachts aufwacht?",
+  ],
+  "Nachtnahrung / Ernährung": [
+    "Wird dein Kind gestillt, bekommt es die Flasche oder isst es bereits Beikost?",
+  ],
+  "Entwicklung / Veränderungen": [
+    "Gab es in den letzten Wochen Veränderungen wie Zahnen, Krankheit oder Entwicklungsschritte?",
+  ],
+  Gesundheit: [
+    "Gibt es gesundheitliche Besonderheiten wie Reflux, Allergien oder ein Zungenband?",
+  ],
+  Temperament: [
+    "Wie würdest du dein Kind beschreiben – eher ruhig, sensibel, High Need oder gefühlsstark?",
+  ],
+  Bezugspersonen: [
+    "Wer begleitet euer Kind beim Schlafen – immer dieselbe Person oder wechselnd?",
+  ],
+  "Seit wann das Problem besteht": [
+    "Seit wann besteht das Schlafproblem ungefähr?",
+  ],
+  Abendroutine: [
+    "Was macht ihr vom Abendessen bis zum Einschlafen ganz genau?",
+  ],
+  "Belastung der Familie": [
+    "Wie belastend fühlt sich die Situation für euch als Familie gerade an?",
+    "Empfindet ihr die aktuelle Schlafsituation als anstrengend oder überfordernd?",
+  ],
+};
 
-  if (!memory.mainProblem) {
-    return "Was belastet euch aktuell beim Schlaf am meisten?";
-  }
-
-  // ------------------------
-  // Einschlafhilfe
-  // ------------------------
-
+function contextualQuestion(memory: Record<string, unknown>): string | undefined {
   if (memory.bedtimeSupport) {
-    const value = memory.bedtimeSupport.toLowerCase();
+    const value = String(memory.bedtimeSupport).toLowerCase();
 
     if (value.includes("brust")) {
       return random(followUps.bedtimeSupport.brust);
     }
-
     if (value.includes("flasche")) {
       return random(followUps.bedtimeSupport.flasche);
     }
-
     if (value.includes("tragen")) {
       return random(followUps.bedtimeSupport.tragen);
     }
-
     if (value.includes("ball")) {
       return random(followUps.bedtimeSupport.pezziball);
     }
-
     if (value.includes("schnuller")) {
       return random(followUps.bedtimeSupport.schnuller);
     }
   }
 
-  // ------------------------
-  // Nächte
-  // ------------------------
-
   if (memory.nightWakeups) {
-    const value = memory.nightWakeups.toLowerCase();
-
-    if (
-      value.includes("jede") ||
-      value.includes("stünd")
-    ) {
+    const value = String(memory.nightWakeups).toLowerCase();
+    if (value.includes("jede") || value.includes("stünd")) {
       return random(followUps.nightWakeups["jede Stunde"]);
     }
-
     return random(followUps.nightWakeups.häufig);
   }
 
-  // ------------------------
-  // kurze Schläfchen
-  // ------------------------
+  return undefined;
+}
 
-  if (
-    memory.napLength &&
-    /(20|25|30|35|40)/.test(memory.napLength)
-  ) {
-    return random(followUps.napLength.kurz);
+export function getFollowUpQuestions(
+  memory: Record<string, unknown>,
+  max = 2
+): string[] {
+  const contextual = contextualQuestion(memory);
+  const missing = getMissingAreas(memory);
+  const questions: string[] = [];
+
+  if (contextual) {
+    questions.push(contextual);
   }
 
-  // ------------------------
-  // lange Wachphasen
-  // ------------------------
+  for (const area of missing) {
+    const options = areaQuestions[area];
+    if (!options?.length) continue;
 
-  if (
-    memory.wakeWindows &&
-    /(4|5|6)/.test(memory.wakeWindows)
-  ) {
-    return random(followUps.wakeWindows.lang);
+    const question = random(options);
+    if (!questions.includes(question)) {
+      questions.push(question);
+    }
+
+    if (questions.length >= max) break;
   }
 
-  // ------------------------
-  // Routine vorhanden
-  // ------------------------
+  return questions.slice(0, max);
+}
 
-  if (memory.bedtimeRoutine) {
-    return random(
-      followUps.bedtimeRoutine.vorhanden
-    );
-  }
-
-  // ------------------------
-  // Standardfragen
-  // ------------------------
-
-  if (!memory.duration) {
-    return "Seit wann besteht das Schlafproblem ungefähr?";
-  }
-
-  if (!memory.bedtime) {
-    return "Wie läuft das Einschlafen aktuell Schritt für Schritt ab?";
-  }
-
-  if (!memory.bedtimeRoutine) {
-    return "Was macht ihr vom Abendessen bis zum Einschlafen ganz genau?";
-  }
-
-  if (!memory.bedtimeDuration) {
-    return "Wie lange dauert das Einschlafen ungefähr?";
-  }
-
-  if (!memory.naps) {
-    return "Wie viele Schläfchen macht dein Kind tagsüber?";
-  }
-
-  if (!memory.wakeWindows) {
-    return "Wie lange ist dein Kind morgens wach, bevor es das erste Schläfchen macht?";
-  }
-
-  if (!memory.napLength) {
-    return "Wie lange dauern die einzelnen Schläfchen ungefähr?";
-  }
-
-  if (!memory.napPlace) {
-    return "Wo macht dein Kind tagsüber seine Schläfchen?";
-  }
-
-  if (!memory.sleepPlace) {
-    return "Wo schläft dein Kind nachts?";
-  }
-
-  if (!memory.feeding) {
-    return "Wird dein Kind gestillt, bekommt es die Flasche oder isst es bereits Beikost?";
-  }
-
-  if (!memory.light) {
-    return "Ist das Schlafzimmer vollständig abgedunkelt?";
-  }
-
-  if (!memory.noise) {
-    return "Verwendet ihr White Noise oder schläft dein Kind ohne Hintergrundgeräusche?";
-  }
-
-  if (!memory.changes) {
-    return "Gab es in den letzten Wochen Veränderungen wie Zahnen, Krankheit oder Entwicklungsschritte?";
-  }
-
-  if (!memory.health) {
-    return "Gibt es gesundheitliche Besonderheiten wie Reflux, Allergien oder ein Zungenband?";
-  }
-
-  if (!memory.temperament) {
-    return "Wie würdest du dein Kind beschreiben – eher ruhig, sensibel, High Need oder gefühlsstark?";
-  }
-
-  return "";
+export function getFollowUpQuestion(memory: Record<string, unknown>): string {
+  return getFollowUpQuestions(memory, 1)[0] ?? "";
 }

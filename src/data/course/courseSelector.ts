@@ -15,8 +15,10 @@ import {
 } from "./modules";
 import {
   defaultModuleIds,
+  MIN_MODULE_SCORE,
   moduleMatchRules,
   type AnalysisSignal,
+  type ModuleMatchRule,
 } from "./recommendationRules";
 
 export interface CourseSelectionContext {
@@ -55,18 +57,36 @@ function collectAnalysisSignals(
   if (getBedtimeSupport(memory)) signals.add("bedtimeSupport");
   if (getNightSupport(memory)) signals.add("nightSupport");
   if (memory.temperament) signals.add("temperament");
-  if (memory.changes) signals.add("changes");
+  if (memory.changes || memory.development) signals.add("changes");
   if (memory.health) signals.add("health");
+  if (memory.sleepReadiness) signals.add("sleepReadiness");
+  if (memory.caregivers) signals.add("caregivers");
+
+  if (
+    memory.familyBurden ||
+    /belast|erschöpf|anstreng|nicht mehr|überford/.test(
+      `${memory.mainProblem ?? ""} ${memory.duration ?? ""}`.toLowerCase()
+    )
+  ) {
+    signals.add("familyBurden");
+  }
 
   return signals;
 }
 
 function scoreModuleByRules(
-  rule: (typeof moduleMatchRules)[number],
+  rule: ModuleMatchRule,
   signals: Set<AnalysisSignal>,
   issueText: string
 ): number {
   if (rule.excludeWhen?.some((signal) => signals.has(signal))) {
+    return 0;
+  }
+
+  if (
+    rule.requiredSignals &&
+    !rule.requiredSignals.every((signal) => signals.has(signal))
+  ) {
     return 0;
   }
 
@@ -77,10 +97,11 @@ function scoreModuleByRules(
   });
 
   rule.keywords?.forEach((keyword) => {
-    if (issueText.includes(keyword.toLowerCase())) score += 3;
+    if (issueText.includes(keyword.toLowerCase())) score += 2;
   });
 
-  return score;
+  const minScore = rule.minTotalScore ?? MIN_MODULE_SCORE;
+  return score >= minScore ? score : 0;
 }
 
 export function selectModuleIds(
@@ -103,7 +124,7 @@ export function selectModuleIds(
     return ranked.slice(0, limit).map((entry) => entry.moduleId);
   }
 
-  return defaultModuleIds.slice(0, limit);
+  return defaultModuleIds.slice(0, Math.min(limit, defaultModuleIds.length));
 }
 
 export function resolveCourseModule(moduleId: string): ResolvedCourseModule | undefined {
@@ -131,8 +152,11 @@ export function resolveCourseModules(moduleIds: string[]): ResolvedCourseModule[
 
 export function buildCourseModuleRecommendation(
   memory: any,
-  context: CourseSelectionContext
+  context: CourseSelectionContext,
+  analysisReady = false
 ): ResolvedCourseModule[] {
+  if (!analysisReady) return [];
+
   const moduleIds = selectModuleIds(memory, context);
   return resolveCourseModules(moduleIds);
 }

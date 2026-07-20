@@ -18,6 +18,8 @@ import { sleepNeeds } from "../data/sleepNeeds";
 import { shouldAnalyse } from "../engine/reasoningEngine";
 import type { ResolvedCourseModule } from "../data/course";
 import { products } from "../data/products";
+import { courseKnowledgeBase } from "../data/course";
+import { courseModules } from "../data/course";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
@@ -80,20 +82,26 @@ export async function askMimi(messages: Message[]): Promise<MimiResponse> {
   );
 
   (globalThis as any).__mimiMemory = memory;
-  const reasoning = shouldAnalyse(memory);
+  const reasoning = shouldAnalyse(memory, MODE);
 
-  const recommendation = buildRecommendation(memory, MODE);
+  const recommendation = buildRecommendation(memory, MODE, reasoning.ready);
 
   const products =
-    recommendation.mode === "public" && recommendation.product
+    recommendation.mode === "public" &&
+    reasoning.ready &&
+    recommendation.product
       ? [recommendation.product]
       : [];
 
   const modules =
-    recommendation.mode === "course" ? recommendation.modules : [];
+    recommendation.mode === "course" && reasoning.ready
+      ? recommendation.modules
+      : [];
 
   const prompt = `
 ${knowledge}
+
+${courseKnowledgeBase}
 
 ${mayaKnowledge}
 
@@ -113,10 +121,11 @@ ${ageKnowledge}
 
 ${redFlags}
 
-${buildPrompt(
-  memory,
-  recommendation
-)}
+Verfügbare Kursmodule:
+
+${JSON.stringify(courseModules, null, 2)}
+
+${buildPrompt(memory, recommendation, reasoning.ready)}
 
 WICHTIG
 
@@ -128,19 +137,7 @@ Fehlende Informationen:
 
 ${reasoning.missing.join(", ") || "keine"}
 
-Wenn Analyse erlaubt = NEIN
-
-→ Schreibe KEINE Analyse.
-
-→ Empfiehl KEIN Produkt und keine Module.
-
-→ Stelle genau EINE weitere Rückfrage.
-
-Wenn Analyse erlaubt = JA
-
-→ Erstelle die Analyse (gleiche Logik wie immer).
-
-${buildAnalysisEndInstructions(recommendation)}
+${buildAnalysisEndInstructions(recommendation, reasoning.ready)}
   `;
 
   const response = await chat([

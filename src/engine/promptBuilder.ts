@@ -1,16 +1,19 @@
-import { getFollowUpQuestion } from "./followUpEngine";
+import { MODE } from "../config";
+import { getFollowUpQuestion, getFollowUpQuestions } from "./followUpEngine";
 import { buildHypotheses } from "./hypothesisEngine";
-import { shouldAnalyse } from "./reasoningEngine";
+import { ANALYSIS_ORDER_PROMPT, shouldAnalyse } from "./reasoningEngine";
 import type { ModeRecommendation } from "./recommendationEngine";
 import { buildModeOutputPrompt } from "./outputPrompts";
 
 export function buildPrompt(
-    memory:any,
-    recommendation: ModeRecommendation
+  memory: Record<string, unknown>,
+  recommendation: ModeRecommendation,
+  analysisReady = false
 ) {
   const hypotheses = buildHypotheses(memory);
-  const reasoning = shouldAnalyse(memory);
-
+  const reasoning = shouldAnalyse(memory, MODE);
+  const isCourse = recommendation.mode === "course";
+  const nextQuestions = getFollowUpQuestions(memory, isCourse ? 2 : 1);
   const nextQuestion = getFollowUpQuestion(memory);
 
   return `
@@ -77,11 +80,21 @@ Danach entscheidest du:
 1.
 Brauche ich weitere Informationen?
 
-→ Dann stelle genau EINE Rückfrage.
+${
+  isCourse
+    ? `→ Sage: "Ich würde gerne noch ein paar Dinge verstehen, bevor ich eine Einschätzung abgebe."
+→ Stelle ein bis zwei gezielte Rückfragen – nicht mehr auf einmal.
+→ Empfehle KEINE Module, solange die Analyse noch nicht vollständig ist.
+
+Nutze möglichst diese Rückfragen:
+
+${nextQuestions.map((question) => `"${question}"`).join("\n")}`
+    : `→ Dann stelle genau EINE Rückfrage.
 
 Nutze möglichst:
 
-"${nextQuestion}"
+"${nextQuestion}"`
+}
 
 Wenn sich aus der letzten Nachricht eine bessere Rückfrage ergibt,
 verwende stattdessen diese.
@@ -430,37 +443,36 @@ Betrachte immer das Gesamtbild.
 ANALYSE
 -----------------------------------------------------
 
+${ANALYSIS_ORDER_PROMPT}
+
+-----------------------------------------------------
+
 VOR DER ANALYSE
 
-Bevor du eine Analyse schreibst, überprüfst du immer, ob du mindestens Informationen zu folgenden Punkten hast:
+Bevor du eine Analyse schreibst, überprüfst du immer, ob du ausreichend Informationen zu allen relevanten Bereichen hast.
 
-- Alter
-- Hauptproblem
-- Seit wann
-- Einschlafbegleitung (mit welcher Einschlafhilfe)
-- Einschlafdauer
-- Verhalten während der Einschlafbegleitung
-- Abendroutine
-- Vorhersehbarkeit vor dem Schlafen
-- Bettzeit
-- Anzahl der Tagschläfchen
-- Gesamtdauer des Tagschlafs
-- Wachphasen tagsüber
-- Schlafort nachts
-- nächtliches Aufwachen
-- Länge und Häufigkeit des nächtlichen Aufwachens
-- Verhalten und Stimmung während des nächtlichen Aufwachens
-- Hilfe nachts
-- Ernährung
-- Temperament
-- Gesundheit
-- Veränderungen
+${
+  isCourse
+    ? `Im Schlummerwerkstatt-Modus darfst du Module erst empfehlen, wenn das Gesamtbild vollständig ist.
 
-Fehlen mehrere dieser Informationen,
+Empfehle Module nur, wenn mehrere Hinweise zusammenpassen – nicht bei einzelnen Beobachtungen.
+
+Vor jeder Modulempfehlung fasse das Gesamtbild zusammen:
+"Ich glaube, ich habe inzwischen ein gutes Gesamtbild."
+"Mir fallen aktuell vor allem folgende Bereiche auf: …"
+"Deshalb würde ich dir zuerst diese Module empfehlen."`
+    : ""
+}
+
+Fehlen wesentliche Informationen,
 
 schreibst du KEINE Analyse.
 
-Du stellst stattdessen genau EINE weitere Rückfrage.
+${
+  isCourse
+    ? `Du stellst stattdessen ein bis zwei gezielte Rückfragen.`
+    : `Du stellst stattdessen genau EINE weitere Rückfrage.`
+}
 
 Die Analyse dient ausschließlich dazu,
 
@@ -542,7 +554,7 @@ Die eigentliche Lösung findet ausschließlich im empfohlenen Angebot statt.`
 -----------------------------------------------------
 
 
-${buildModeOutputPrompt(recommendation)}
+${buildModeOutputPrompt(recommendation, analysisReady)}
 
 -----------------------------------------------------
 
@@ -579,10 +591,14 @@ Du fragst niemals:
 
 Nach der Produktempfehlung oder Modulempfehlung endet die Antwort.
 
-Die LETZTE Zeile deiner Antwort lautet immer exakt:
+${
+  analysisReady
+    ? `Die LETZTE Zeile deiner Antwort lautet immer exakt:
 
 ### ANALYSE BEENDET ###
 
-Diese Zeile darf niemals verändert werden.
+Diese Zeile darf niemals verändert werden.`
+    : `Beende die Antwort OHNE ### ANALYSE BEENDET ###, solange die Analyse noch nicht vollständig ist.`
+}
 `;
 }
