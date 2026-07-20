@@ -12,9 +12,10 @@ export function buildPublicOutputPrompt(
   recommendation: Extract<ModeRecommendation, { mode: "public" }>
 ): string {
   return `
-PRODUKTEMPFEHLUNG (Öffentlicher Modus)
+PRODUKTEMPFEHLUNG (Öffentlicher Modus – Schlafkompass)
 
 Unter deiner Antwort erscheint automatisch genau EIN Angebot als Produktkarte.
+Die Produktkarte wird NUR angezeigt, wenn deine Antwort mit ### ANALYSE BEENDET ### endet.
 
 Das empfohlene Angebot (NUR für dein Wissen – NIEMALS im Fließtext nennen):
 
@@ -39,9 +40,13 @@ WICHTIG – NIEMALS im Fließtext:
 
 Der konkrete Produktname erscheint ausschließlich in der Produktkarte unter der Analyse.
 
+Du empfiehlst KEINE Module der Schlummerwerkstatt – nur das automatisch angezeigte Produkt.
+
 Schreibe keine allgemeine Werbebeschreibung. Beziehe dich immer auf die individuellen Antworten der Familie.
 
 Verkaufe nicht. Erkläre den persönlichen Bezug.
+
+Beende die Analyse IMMER mit der Zeile ### ANALYSE BEENDET ### – sonst erscheint keine Produktkarte.
 `.trim();
 }
 
@@ -73,11 +78,14 @@ Stelle dann ein bis zwei gezielte Rückfragen zu fehlenden Bereichen.
   );
 
   return `
-MODUL-EMPFEHLUNG (Schlummerwerkstatt-Kurs-Modus)
+MODUL-EMPFEHLUNG (Schlummerwerkstatt – nur Kursmodule)
 
 Die Familie hat bereits Zugang zur Schlummerwerkstatt.
 
 Verkaufe KEINE externen Kurse oder Produkte. Empfehle ausschließlich konkrete Module aus der Schlummerwerkstatt.
+Empfehle NIEMALS Produkte aus dem öffentlichen Schlafkompass (Mini-Kurs, 1:1 Beratung usw.).
+
+Die Modulkarten werden NUR angezeigt, wenn deine Antwort mit ### ANALYSE BEENDET ### endet.
 
 Empfohlene Module mit Begründung (erscheinen automatisch als Karten unter der Analyse):
 
@@ -125,13 +133,24 @@ export function buildAnalysisEndInstructions(
   analysisReady: boolean
 ): string {
   if (!analysisReady) {
+    if (recommendation.mode === "course") {
+      return `
+Analyse noch NICHT erlaubt.
+
+→ Schreibe KEINE Analyse.
+→ Empfehle KEINE Module.
+→ Sage: "Ich würde gerne noch ein paar Dinge verstehen, bevor ich eine Einschätzung abgebe."
+→ Stelle ein bis zwei gezielte Rückfragen zu den fehlenden Bereichen.
+→ Beende die Antwort OHNE ### ANALYSE BEENDET ###
+      `.trim();
+    }
+
     return `
 Analyse noch NICHT erlaubt.
 
 → Schreibe KEINE Analyse.
-→ Empfehle KEIN Produkt und keine Module.
-→ Sage: "Ich würde gerne noch ein paar Dinge verstehen, bevor ich eine Einschätzung abgebe."
-→ Stelle ein bis zwei gezielte Rückfragen zu den fehlenden Bereichen.
+→ Empfehle KEIN Produkt.
+→ Stelle genau EINE gezielte Rückfrage zu den fehlenden Bereichen.
 → Beende die Antwort OHNE ### ANALYSE BEENDET ###
     `.trim();
   }
@@ -156,8 +175,11 @@ Nach der Analyse:
 
 → Schreibe 2–4 personalisierte Sätze zur Produktempfehlung (ohne Kursnamen – siehe PRODUKTEMPFEHLUNG).
 → Nenne im Fließtext NIEMALS einen Kursnamen oder Produkttitel.
-→ Beende die Antwort mit
+→ Die Produktkarte erscheint automatisch unter deiner Antwort – du musst den Produktnamen nicht nennen.
+→ Beende die Antwort zwingend mit
 
 ### ANALYSE BEENDET ###
+
+Ohne diese Zeile wird keine Produktkarte angezeigt.
   `.trim();
 }

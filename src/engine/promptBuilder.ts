@@ -1,4 +1,4 @@
-import { resolveAppMode } from "../config";
+import type { AppMode } from "../config";
 import { getFollowUpQuestion, getFollowUpQuestions } from "./followUpEngine";
 import { buildHypotheses } from "./hypothesisEngine";
 import { ANALYSIS_ORDER_PROMPT, shouldAnalyse } from "./reasoningEngine";
@@ -10,11 +10,16 @@ export function buildPrompt(
   recommendation: ModeRecommendation,
   analysisReady = false
 ) {
-  const hypotheses = buildHypotheses(memory);
-  const reasoning = shouldAnalyse(memory, resolveAppMode());
   const isCourse = recommendation.mode === "course";
-  const nextQuestions = getFollowUpQuestions(memory, isCourse ? 2 : 1);
-  const nextQuestion = getFollowUpQuestion(memory);
+  const appMode: AppMode = isCourse ? "course" : "public";
+  const hypotheses = buildHypotheses(memory);
+  const reasoning = shouldAnalyse(memory, appMode);
+  const nextQuestions = getFollowUpQuestions(
+    memory,
+    isCourse ? 2 : 1,
+    appMode
+  );
+  const nextQuestion = getFollowUpQuestion(memory, appMode);
 
   return `
 Du bist Mimi.
@@ -443,11 +448,7 @@ Betrachte immer das Gesamtbild.
 ANALYSE
 -----------------------------------------------------
 
-${ANALYSIS_ORDER_PROMPT}
-
------------------------------------------------------
-
-VOR DER ANALYSE
+${isCourse ? `${ANALYSIS_ORDER_PROMPT}\n\n-----------------------------------------------------\n\n` : ""}VOR DER ANALYSE
 
 Bevor du eine Analyse schreibst, überprüfst du immer, ob du ausreichend Informationen zu allen relevanten Bereichen hast.
 

@@ -64,13 +64,16 @@ Wie alt ist dein Kind aktuell?`,
     try {
       const answer = await askMimi(history);
 
-      if (
-        answer.message.includes(
-          "### ANALYSE BEENDET ###"
-        )
-      ) {
-        setRecommendedProducts(answer.products);
-        setRecommendedModules(answer.modules);
+      const analysisComplete = answer.message.includes("### ANALYSE BEENDET ###");
+
+      if (analysisComplete) {
+        if (answer.mode === "course") {
+          setRecommendedProducts([]);
+          setRecommendedModules(answer.modules);
+        } else {
+          setRecommendedProducts(answer.products);
+          setRecommendedModules([]);
+        }
       }
 
       setMessages([

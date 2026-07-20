@@ -5,7 +5,8 @@ export interface AnalysisArea {
   label: string;
 }
 
-export const ANALYSIS_AREAS: AnalysisArea[] = [
+/** Vollständige Analyse – nur Schlummerwerkstatt */
+export const COURSE_ANALYSIS_AREAS: AnalysisArea[] = [
   { keys: ["age"], label: "Alter des Kindes" },
   { keys: ["mainProblem"], label: "Hauptproblem" },
   { keys: ["naps", "napCount"], label: "Tagschlaf – Anzahl" },
@@ -28,6 +29,30 @@ export const ANALYSIS_AREAS: AnalysisArea[] = [
   { keys: ["familyBurden"], label: "Belastung der Familie" },
 ];
 
+/** Kompakte Analyse – kostenloser Schlafkompass (wie bisher) */
+export const PUBLIC_ANALYSIS_AREAS: AnalysisArea[] = [
+  { keys: ["age"], label: "Alter des Kindes" },
+  { keys: ["mainProblem"], label: "Hauptproblem" },
+  { keys: ["duration"], label: "Seit wann" },
+  { keys: ["bedtimeSupport"], label: "Einschlafhilfe" },
+  { keys: ["bedtimeDuration"], label: "Einschlafdauer" },
+  { keys: ["bedtimeRoutine"], label: "Abendroutine" },
+  { keys: ["bedtime"], label: "Bettzeit" },
+  { keys: ["naps", "napCount"], label: "Tagschläfchen" },
+  { keys: ["wakeWindows"], label: "Wachzeiten" },
+  { keys: ["sleepPlace"], label: "Schlafort nachts" },
+  { keys: ["nightWakeups"], label: "Nächtliches Aufwachen" },
+  { keys: ["nightSupport"], label: "Hilfe nachts" },
+  { keys: ["feeding"], label: "Ernährung" },
+  { keys: ["temperament"], label: "Temperament" },
+  { keys: ["health"], label: "Gesundheit" },
+  { keys: ["changes"], label: "Veränderungen" },
+];
+
+function getAreasForMode(mode: AppMode): AnalysisArea[] {
+  return mode === "course" ? COURSE_ANALYSIS_AREAS : PUBLIC_ANALYSIS_AREAS;
+}
+
 function hasArea(memory: Record<string, unknown>, area: AnalysisArea): boolean {
   return area.keys.some((key) => {
     const value = memory[key];
@@ -35,14 +60,20 @@ function hasArea(memory: Record<string, unknown>, area: AnalysisArea): boolean {
   });
 }
 
-export function getMissingAreas(memory: Record<string, unknown>): string[] {
-  return ANALYSIS_AREAS.filter((area) => !hasArea(memory, area)).map(
-    (area) => area.label
-  );
+export function getMissingAreas(
+  memory: Record<string, unknown>,
+  mode: AppMode = "public"
+): string[] {
+  return getAreasForMode(mode)
+    .filter((area) => !hasArea(memory, area))
+    .map((area) => area.label);
 }
 
-export function shouldAnalyse(memory: Record<string, unknown>, mode: AppMode = "public") {
-  const missing = getMissingAreas(memory);
+export function shouldAnalyse(
+  memory: Record<string, unknown>,
+  mode: AppMode = "public"
+) {
+  const missing = getMissingAreas(memory, mode);
 
   if (mode === "course") {
     return {
@@ -58,7 +89,7 @@ export function shouldAnalyse(memory: Record<string, unknown>, mode: AppMode = "
 }
 
 export const ANALYSIS_ORDER_PROMPT = `
-INTERNE ANALYSE-REIHENFOLGE
+INTERNE ANALYSE-REIHENFOLGE (nur Schlummerwerkstatt)
 
 Denke immer ungefähr in dieser Reihenfolge:
 
@@ -76,5 +107,5 @@ Denke immer ungefähr in dieser Reihenfolge:
 12. Ernährung
 
 Springe nicht sofort auf Schlafassoziationen.
-Empfehle nicht sofort Module oder Produkte.
+Empfehle nicht sofort Module.
 `.trim();

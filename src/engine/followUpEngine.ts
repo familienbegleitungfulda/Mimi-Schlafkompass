@@ -1,4 +1,6 @@
 import { getMissingAreas } from "./reasoningEngine";
+import type { AppMode } from "../config";
+import { resolveAppMode } from "../config";
 import { followUps } from "../data/followUps";
 
 function random(list: string[]) {
@@ -101,10 +103,11 @@ function contextualQuestion(memory: Record<string, unknown>): string | undefined
 
 export function getFollowUpQuestions(
   memory: Record<string, unknown>,
-  max = 2
+  max = 2,
+  mode: AppMode = resolveAppMode()
 ): string[] {
   const contextual = contextualQuestion(memory);
-  const missing = getMissingAreas(memory);
+  const missing = getMissingAreas(memory, mode);
   const questions: string[] = [];
 
   if (contextual) {
@@ -126,6 +129,9 @@ export function getFollowUpQuestions(
   return questions.slice(0, max);
 }
 
-export function getFollowUpQuestion(memory: Record<string, unknown>): string {
-  return getFollowUpQuestions(memory, 1)[0] ?? "";
+export function getFollowUpQuestion(
+  memory: Record<string, unknown>,
+  mode: AppMode = resolveAppMode()
+): string {
+  return getFollowUpQuestions(memory, 1, mode)[0] ?? "";
 }

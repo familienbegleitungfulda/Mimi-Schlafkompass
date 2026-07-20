@@ -100,13 +100,14 @@ export async function askMimi(messages: Message[]): Promise<MimiResponse> {
   const reasoning = shouldAnalyse(memory, mode);
   const recommendation = buildRecommendation(memory, mode, reasoning.ready);
 
+  // Schlafkompass: Produkt immer mitschicken, sobald eins gewählt wurde.
+  // Anzeige in der UI erst bei ### ANALYSE BEENDET ###.
   const recommendedProducts =
-    recommendation.mode === "public" &&
-    reasoning.ready &&
-    recommendation.product
+    recommendation.mode === "public" && recommendation.product
       ? [recommendation.product]
       : [];
 
+  // Schlummerwerkstatt: Module nur bei vollständiger Analyse.
   const recommendedModules =
     recommendation.mode === "course" && reasoning.ready
       ? recommendation.modules
