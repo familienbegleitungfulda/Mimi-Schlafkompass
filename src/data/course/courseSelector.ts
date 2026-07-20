@@ -7,13 +7,17 @@ import {
   isUnder6Months,
 } from "../../engine/associationEngine";
 import {
+  courseModuleMap,
+  getRoadmapForModule,
+  getTodayActionsForModule,
+  type ModuleRoadmap,
+  type RoadmapChapter,
+} from "./modules";
+import {
   defaultModuleIds,
   moduleMatchRules,
   type AnalysisSignal,
-} from "./courseKnowledge";
-import { courseModuleMap } from "./modules";
-import { getRoadmapForModule, type ModuleRoadmap, type RoadmapChapter } from "./moduleRoadmaps";
-import { getTodayActionsForModule } from "./todayActions";
+} from "./recommendationRules";
 
 export interface CourseSelectionContext {
   detectedIssues: string[];
