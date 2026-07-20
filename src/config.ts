@@ -1,14 +1,68 @@
 export type AppMode = "public" | "course";
 
-const envMode = import.meta.env.VITE_MIMI_MODE as AppMode | undefined;
+const VALID_MODES: AppMode[] = ["public", "course"];
 
-export const MODE: AppMode =
-  envMode === "course" || envMode === "public" ? envMode : "public";
+/** Hosts that always load the Schlummerwerkstatt (course) experience. */
+const COURSE_HOST_PATTERNS = ["schlummerwerkstatt"];
+
+/** Hosts that always load the free/public Mimi experience. */
+const PUBLIC_HOST_PATTERNS = ["schlafkompass"];
+
+function getHostname(): string {
+  if (typeof window === "undefined") {
+    return "";
+  }
+
+  return window.location.hostname.toLowerCase();
+}
+
+function isCourseHost(): boolean {
+  const host = getHostname();
+  return COURSE_HOST_PATTERNS.some((pattern) => host.includes(pattern));
+}
+
+function isPublicHost(): boolean {
+  const host = getHostname();
+  return (
+    PUBLIC_HOST_PATTERNS.some((pattern) => host.includes(pattern)) &&
+    !isCourseHost()
+  );
+}
+
+function modeFromEnv(): AppMode | undefined {
+  const envMode = import.meta.env.VITE_MIMI_MODE as AppMode | undefined;
+  return VALID_MODES.includes(envMode as AppMode)
+    ? (envMode as AppMode)
+    : undefined;
+}
+
+/**
+ * Resolve app mode at runtime.
+ *
+ * Priority:
+ * 1. Schlummerwerkstatt hostnames (e.g. mimi-schlummerwerkstatt.netlify.app)
+ * 2. Public hostnames (e.g. mimi-schlafkompass.netlify.app)
+ * 3. VITE_MIMI_MODE build-time override (local dev)
+ * 4. public (default)
+ */
+export function resolveAppMode(): AppMode {
+  if (isCourseHost()) {
+    return "course";
+  }
+
+  if (isPublicHost()) {
+    return "public";
+  }
+
+  return modeFromEnv() ?? "public";
+}
+
+export const MODE: AppMode = resolveAppMode();
 
 export function isPublicMode(): boolean {
-  return MODE === "public";
+  return resolveAppMode() === "public";
 }
 
 export function isCourseMode(): boolean {
-  return MODE === "course";
+  return resolveAppMode() === "course";
 }

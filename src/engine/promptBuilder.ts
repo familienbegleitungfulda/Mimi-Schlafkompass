@@ -1,4 +1,4 @@
-import { MODE } from "../config";
+import { resolveAppMode } from "../config";
 import { getFollowUpQuestion, getFollowUpQuestions } from "./followUpEngine";
 import { buildHypotheses } from "./hypothesisEngine";
 import { ANALYSIS_ORDER_PROMPT, shouldAnalyse } from "./reasoningEngine";
@@ -11,7 +11,7 @@ export function buildPrompt(
   analysisReady = false
 ) {
   const hypotheses = buildHypotheses(memory);
-  const reasoning = shouldAnalyse(memory, MODE);
+  const reasoning = shouldAnalyse(memory, resolveAppMode());
   const isCourse = recommendation.mode === "course";
   const nextQuestions = getFollowUpQuestions(memory, isCourse ? 2 : 1);
   const nextQuestion = getFollowUpQuestion(memory);

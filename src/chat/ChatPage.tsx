@@ -4,7 +4,7 @@ import type { Message } from "./conversation";
 import { products as allProducts } from "../data/products";
 import type { ResolvedCourseModule } from "../data/course";
 import ChatInput from "../components/ChatInput";
-import { isCourseMode, MODE } from "../config";
+import { isCourseMode, resolveAppMode } from "../config";
 import { getMimiTheme } from "../theme";
 
 export default function ChatPage() {
@@ -450,7 +450,7 @@ Wie alt ist dein Kind aktuell?`,
             marginTop: 16,
           }}
         >
-          Modus: {MODE}
+          Modus: {resolveAppMode()}
         </p>
       )}
     </main>

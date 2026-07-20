@@ -1,5 +1,5 @@
 import type { Message } from "../chat/conversation";
-import { MODE } from "../config";
+import { resolveAppMode, type AppMode } from "../config";
 import { extractionPrompt } from "../engine/extractionPrompt";
 import { buildRecommendation } from "../engine/recommendationEngine";
 import { buildAnalysisEndInstructions } from "../engine/outputPrompts";
@@ -51,10 +51,12 @@ export type MimiResponse = {
   message: string;
   products: (typeof products)[number][];
   modules: ResolvedCourseModule[];
-  mode: typeof MODE;
+  mode: AppMode;
 };
 
 export async function askMimi(messages: Message[]): Promise<MimiResponse> {
+  const mode = resolveAppMode();
+
   const extraction = await chat([
     {
       role: "system",
@@ -82,9 +84,9 @@ export async function askMimi(messages: Message[]): Promise<MimiResponse> {
   );
 
   (globalThis as any).__mimiMemory = memory;
-  const reasoning = shouldAnalyse(memory, MODE);
+  const reasoning = shouldAnalyse(memory, mode);
 
-  const recommendation = buildRecommendation(memory, MODE, reasoning.ready);
+  const recommendation = buildRecommendation(memory, mode, reasoning.ready);
 
   const products =
     recommendation.mode === "public" &&
@@ -152,6 +154,6 @@ ${buildAnalysisEndInstructions(recommendation, reasoning.ready)}
     message: response.choices[0].message.content ?? "",
     products,
     modules,
-    mode: MODE,
+    mode,
   };
 }

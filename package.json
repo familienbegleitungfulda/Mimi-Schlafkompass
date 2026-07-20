@@ -5,7 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:course": "VITE_MIMI_MODE=course vite",
+    "dev:public": "VITE_MIMI_MODE=public vite",
     "build": "tsc -b && vite build",
+    "build:course": "VITE_MIMI_MODE=course npm run build",
+    "build:public": "VITE_MIMI_MODE=public npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },

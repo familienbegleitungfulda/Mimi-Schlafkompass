@@ -1,5 +1,5 @@
 import type { AppMode } from "./config";
-import { MODE } from "./config";
+import { resolveAppMode } from "./config";
 
 export interface MimiTheme {
   pageBackground: string;
@@ -67,6 +67,6 @@ const courseTheme: MimiTheme = {
   goldAccent: "#c4a574",
 };
 
-export function getMimiTheme(mode: AppMode = MODE): MimiTheme {
+export function getMimiTheme(mode: AppMode = resolveAppMode()): MimiTheme {
   return mode === "course" ? courseTheme : publicTheme;
 }
