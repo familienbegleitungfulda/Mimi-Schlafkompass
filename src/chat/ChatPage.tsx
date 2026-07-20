@@ -84,14 +84,20 @@ Wie alt ist dein Kind aktuell?`,
         },
       ]);
     } catch (error) {
-      console.error("askMimi failed:", error);
+      console.error(error);
+
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : typeof error === "string"
+            ? error
+            : JSON.stringify(error, null, 2);
 
       setMessages([
         ...history,
         {
           role: "assistant",
-          content:
-            "Entschuldige, gerade konnte ich nicht antworten. Bitte versuche es gleich noch einmal.",
+          content: `Fehler (Debug):\n\n${errorMessage}`,
         },
       ]);
     }
