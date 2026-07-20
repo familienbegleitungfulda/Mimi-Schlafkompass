@@ -6,6 +6,12 @@ import { reizverarbeitungModule } from "./reizverarbeitung";
 import { schlafdruckModule } from "./schlafdruck";
 import { tagschlafModule } from "./tagschlaf";
 import { tagesstrukturModule } from "./tagesstruktur";
+import { schlafentwicklungModule } from "./schlafentwicklung";
+import { strukturModule } from "./struktur";
+import { schlafbereitschaftModule } from "./schlafbereitschaft";
+import { schlafassoziationenModule } from "./schlafassoziationen";
+import { bezugspersonenModule } from "./bezugspersonen";
+import { praktischeTippsModule } from "./praktische-tipps";
 import type {
   CourseModule,
   CourseModuleDefinition,
@@ -15,7 +21,13 @@ import type {
 
 export const allCourseModuleDefinitions: CourseModuleDefinition[] = [
   grundlagenModule,
+  schlafentwicklungModule,
+  strukturModule,
+  schlafbereitschaftModule,
   schlafdruckModule,
+  praktischeTippsModule,
+  bezugspersonenModule,
+  schlafassoziationenModule,
   tagesstrukturModule,
   reizverarbeitungModule,
   tagschlafModule,

@@ -2,12 +2,17 @@ import type { CourseModuleDefinition } from "./types";
 
 export const grundlagenModule: CourseModuleDefinition = {
   id: "grundlagen",
+
   title: "Grundlagen des Babyschlafs",
+
   description:
-    "Die biologischen Grundlagen des Babyschlafs verstehen, häufige Mythen einordnen und eine sichere sowie bindungsorientierte Schlafbegleitung kennenlernen.",
+    "Dieses Modul vermittelt die biologischen Grundlagen des Babyschlafs. Es erklärt, warum Babys schlafen, wie sich der Schlaf entwickelt, warum nächtliches Erwachen normal ist, welche Empfehlungen zum sicheren Babyschlaf gelten und warum Schlaftraining aus bindungsorientierter Sicht nicht empfohlen wird.",
+
   shortDescription:
-    "Die biologischen Grundlagen des Babyschlafs verstehen, häufige Mythen einordnen und eine sichere sowie bindungsorientierte Schlafbegleitung kennenlernen.",
+    "Biologische Grundlagen des Babyschlafs, sichere Schlafumgebung und bindungsorientierte Einordnung typischer Schlafmythen.",
+
   order: 1,
+
   recommendWhen: [
     "Die Eltern möchten den Babyschlaf grundsätzlich besser verstehen.",
     "Fragen zum Durchschlafen.",
@@ -18,7 +23,10 @@ export const grundlagenModule: CourseModuleDefinition = {
     "Fragen zur sicheren Schlafumgebung.",
     "Fragen zu Schlaftraining.",
     "Die Eltern sorgen sich, ihr Kind durch Nähe zu verwöhnen.",
+    "Die Eltern vergleichen ihr Kind häufig mit anderen Kindern.",
+    "Unsicherheit darüber, was im ersten Lebensjahr überhaupt normal ist."
   ],
+
   learningGoals: [
     "Verstehen, warum Schlaf für Babys wichtig ist.",
     "Den Schlaf-Wach-Rhythmus von Säuglingen verstehen.",
@@ -28,76 +36,111 @@ export const grundlagenModule: CourseModuleDefinition = {
     "Durchschlafen realistisch einordnen.",
     "Die wichtigsten Empfehlungen zur Prävention des plötzlichen Kindstods kennen.",
     "Ein sicheres Familienbett gestalten können.",
-    "Schlaftraining und bindungsorientierte Alternativen unterscheiden können.",
+    "Schlaftraining und bindungsorientierte Alternativen unterscheiden können."
   ],
+
   relatedKnowledge: [
+    "warum-schlafen",
+    "schlafzyklen",
+    "schlafbedarf",
+    "einschlafbegleitung",
     "durchschlafen",
-    "familienbett",
     "sids",
-    "schlaftraining",
+    "familienbett",
+    "schlaftraining"
   ],
-  nextModules: ["schlafdruck", "reizverarbeitung", "tagesstruktur", "abendroutine"],
+
+  nextModules: [
+    "schlafdruck",
+    "reizverarbeitung",
+    "tagesstruktur",
+    "abendroutine"
+  ],
+
   priority: 1,
+
   prerequisites: [],
+
   todayActions: [
     {
-      id: "grundlagen-1",
-      text: "Eigene Erwartungen an den Babyschlaf überprüfen.",
+      id: "grundlagen-erwartungen",
+      text: "Überprüfe deine Erwartungen an den Babyschlaf und frage dich, ob sie biologisch realistisch sind.",
       priority: 1,
     },
     {
-      id: "grundlagen-2",
-      text: "Die Schlafumgebung anhand der aktuellen Empfehlungen kontrollieren.",
+      id: "grundlagen-sicherheit",
+      text: "Kontrolliere eure Schlafumgebung anhand der Empfehlungen zum sicheren Babyschlaf.",
       priority: 2,
     },
     {
-      id: "grundlagen-3",
-      text: "Nächtliches Erwachen zunächst als normale Entwicklung betrachten.",
+      id: "grundlagen-durchschlafen",
+      text: "Ordne nächtliches Erwachen zunächst als normalen Bestandteil der kindlichen Schlafentwicklung ein.",
       priority: 3,
     },
     {
-      id: "grundlagen-4",
-      text: "Keine Veränderungen aus gesellschaftlichem Druck heraus vornehmen.",
+      id: "grundlagen-druck",
+      text: "Vermeide Veränderungen nur deshalb, weil dein Umfeld meint, dein Kind müsse bereits anders schlafen.",
       priority: 4,
     },
   ],
+
   roadmap: {
     chapters: [
       {
-        id: "gl-1",
-        title: "Warum Babys schlafen",
-        timestamp: "Kapitel 1.1",
-        description: "Biologische Grundlagen und individueller Schlafbedarf.",
+        id: "warum-schlafen",
+        title: "Warum schlafen wir?",
+        description: "Regeneration, Verarbeitung, Lernen und Immunsystem."
       },
       {
-        id: "gl-2",
-        title: "Schlafzyklen und Einschlafbegleitung",
-        timestamp: "Kapitel 1.3",
-        description: "Schlafphasen verstehen und Einschlafhilfe einordnen.",
+        id: "schlafentwicklung",
+        title: "Schlafentwicklung und Schlafzyklen",
+        description: "Ultradianer Rhythmus, Schlafphasen und Schlafzyklen."
       },
-    ],
-    pdfs: [
       {
-        id: "gl-pdf-1",
-        title: "Grundlagen-Übersicht",
-        filename: "grundlagen-uebersicht.pdf",
+        id: "schlafbedarf",
+        title: "Schlafbedarf",
+        description: "Warum Schlafenszeiten individuell sind und Tabellen nur Orientierung bieten."
       },
-    ],
-    bonus: [
       {
-        id: "gl-bonus-1",
-        title: "Mythen vs. Fakten",
-        description: "Häufige Schlafmythen im Überblick.",
+        id: "einschlafbegleitung",
+        title: "Einschlafen und Einschlafbegleitung",
+        description: "Warum Begleitung biologisch normal ist und welche Faktoren Einschlafen beeinflussen."
       },
+      {
+        id: "durchschlafen",
+        title: "Durchschlafen",
+        description: "Was Durchschlafen bedeutet und warum nächtliches Erwachen normal ist."
+      },
+      {
+        id: "sids",
+        title: "Plötzlicher Kindstod",
+        description: "Risikofaktoren, Schutzfaktoren und Empfehlungen zum sicheren Babyschlaf."
+      },
+      {
+        id: "familienbett",
+        title: "Familienbett",
+        description: "Sicheres Bettsharing und wichtige Voraussetzungen."
+      },
+      {
+        id: "schlaftraining",
+        title: "Schlaftraining",
+        description: "Einordnung verschiedener Schlaftrainings und bindungsorientierte Alternativen."
+      }
     ],
+
+    pdfs: [],
+
+    bonus: [],
+
     exercises: [
       {
-        id: "gl-ex-1",
+        id: "erwartungscheck",
         title: "Erwartungs-Check",
-        description: "Notiere deine Erwartungen an den Schlaf deines Kindes.",
-      },
-    ],
-  },
+        description:
+          "Notiere, welche Erwartungen du bisher an den Schlaf deines Kindes hattest und welche davon möglicherweise gesellschaftlich geprägt sind."
+      }
+    ]
+  }
 };
 
 export default grundlagenModule;
