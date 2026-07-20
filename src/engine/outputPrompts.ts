@@ -47,12 +47,38 @@ export function buildCourseOutputPrompt(
   recommendation: Extract<ModeRecommendation, { mode: "course" }>
 ): string {
   const moduleDetails = recommendation.modules
-    .map(
-      (module) =>
-        `Modul: ${module.title}
-Beschreibung: ${module.description}
-Kapitel: ${module.chapter}${module.timestamp ? `\nZeitmarke: ${module.timestamp}` : ""}`
-    )
+    .map((module) => {
+      const chapter = module.primaryChapter;
+      const chapterLine = chapter
+        ? `Kapitel: ${chapter.title}${chapter.timestamp ? ` (${chapter.timestamp})` : ""}`
+        : "";
+
+      const pdfs =
+        module.roadmap.pdfs.length > 0
+          ? `PDFs: ${module.roadmap.pdfs.map((pdf) => pdf.title).join(", ")}`
+          : "";
+
+      const exercises =
+        module.roadmap.exercises.length > 0
+          ? `Übungen: ${module.roadmap.exercises.map((exercise) => exercise.title).join(", ")}`
+          : "";
+
+      const bonus =
+        module.roadmap.bonus.length > 0
+          ? `Bonus: ${module.roadmap.bonus.map((item) => item.title).join(", ")}`
+          : "";
+
+      return [
+        `Modul: ${module.title}`,
+        `Beschreibung: ${module.description}`,
+        chapterLine,
+        pdfs,
+        exercises,
+        bonus,
+      ]
+        .filter(Boolean)
+        .join("\n");
+    })
     .join("\n\n");
 
   return `

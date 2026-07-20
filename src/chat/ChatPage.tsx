@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { askMimi } from "../services/openai";
 import type { Message } from "./conversation";
 import { products as allProducts } from "../data/products";
-import type { CourseModule } from "../data/courseModules";
+import type { ResolvedCourseModule } from "../data/course";
 import ChatInput from "../components/ChatInput";
 import { isCourseMode, MODE } from "../config";
 
@@ -13,9 +13,9 @@ export default function ChatPage() {
 
   const [recommendedProducts, setRecommendedProducts] =
     useState<typeof allProducts>([]);
-  const [recommendedModules, setRecommendedModules] = useState<CourseModule[]>(
-    []
-  );
+  const [recommendedModules, setRecommendedModules] = useState<
+    ResolvedCourseModule[]
+  >([]);
 
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -308,9 +308,30 @@ Wie alt ist dein Kind aktuell?`,
                       marginBottom: 16,
                     }}
                   >
-                    {module.chapter}
-                    {module.timestamp ? ` · ${module.timestamp}` : ""}
+                    {module.primaryChapter?.title}
+                    {module.primaryChapter?.timestamp
+                      ? ` · ${module.primaryChapter.timestamp}`
+                      : ""}
                   </p>
+
+                  {(module.roadmap.pdfs.length > 0 ||
+                    module.roadmap.exercises.length > 0) && (
+                    <p
+                      style={{
+                        color: "#888",
+                        fontSize: 13,
+                        marginBottom: 16,
+                      }}
+                    >
+                      {module.roadmap.pdfs.length > 0 &&
+                        `PDF: ${module.roadmap.pdfs.map((pdf) => pdf.title).join(", ")}`}
+                      {module.roadmap.pdfs.length > 0 &&
+                        module.roadmap.exercises.length > 0 &&
+                        " · "}
+                      {module.roadmap.exercises.length > 0 &&
+                        `Übung: ${module.roadmap.exercises.map((exercise) => exercise.title).join(", ")}`}
+                    </p>
+                  )}
 
                   <div
                     style={{

@@ -16,7 +16,7 @@ import { conversationRules } from "../data/conversationRules";
 import { updateMemory } from "../engine/memoryEngine";
 import { sleepNeeds } from "../data/sleepNeeds";
 import { shouldAnalyse } from "../engine/reasoningEngine";
-import type { CourseModule } from "../data/courseModules";
+import type { ResolvedCourseModule } from "../data/course";
 import { products } from "../data/products";
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
@@ -48,7 +48,7 @@ async function chat(messages: any[]) {
 export type MimiResponse = {
   message: string;
   products: (typeof products)[number][];
-  modules: CourseModule[];
+  modules: ResolvedCourseModule[];
   mode: typeof MODE;
 };
 

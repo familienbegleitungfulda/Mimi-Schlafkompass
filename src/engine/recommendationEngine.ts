@@ -1,6 +1,9 @@
 import type { AppMode } from "../config";
-import { schlummerwerkstattModules } from "../data/courseModules";
-import type { CourseModule } from "../data/courseModules";
+import {
+  buildCourseModuleRecommendation,
+  getTodayActionTexts,
+  type ResolvedCourseModule,
+} from "../data/course";
 import { products } from "../data/products";
 import { detectMainCause } from "./analysisEngine";
 import {
@@ -9,7 +12,6 @@ import {
   hasNervousSystemIssues,
   hasStructureIssues,
   isPossibleSleepAssociation,
-  isUnder6Months,
 } from "./associationEngine";
 
 export interface AnalysisContext {
@@ -26,7 +28,7 @@ export interface PublicRecommendation extends AnalysisContext {
 
 export interface CourseRecommendation extends AnalysisContext {
   mode: "course";
-  modules: CourseModule[];
+  modules: ResolvedCourseModule[];
   guidance: string;
   todaySteps: string[];
 }
@@ -92,37 +94,6 @@ function buildAnalysisContext(memory: any): AnalysisContext {
     causeId: cause.id,
     courseFocus: [],
   };
-}
-
-function scoreModule(module: CourseModule, memory: any, context: AnalysisContext): number {
-  let score = 0;
-  const issueText = context.detectedIssues.join(" ").toLowerCase();
-
-  module.when.forEach((tag) => {
-    if (issueText.includes(tag.toLowerCase())) score += 3;
-  });
-
-  if (module.id === "schlafdruck" && hasStructureIssues(memory)) score += 5;
-  if (module.id === "tagesstruktur" && hasStructureIssues(memory)) score += 4;
-  if (module.id === "reizverarbeitung" && hasNervousSystemIssues(memory)) score += 5;
-  if (module.id === "tagschlaf" && (memory.napLength || memory.napCount || memory.naps)) {
-    score += 4;
-  }
-  if (module.id === "abendroutine" && memory.bedtimeRoutine) score += 4;
-  if (module.id === "nachtschlaf" && memory.nightWakeups) score += 4;
-  if (
-    module.id === "einschlafbegleitung" &&
-    isPossibleSleepAssociation(memory) &&
-    !isUnder6Months(memory)
-  ) {
-    score += 2;
-  }
-
-  if (module.id === "einschlafbegleitung" && isUnder6Months(memory)) {
-    score = 0;
-  }
-
-  return score;
 }
 
 function buildPublicRecommendation(memory: any): PublicRecommendation {
@@ -231,30 +202,31 @@ Beende mit: "Das passende Angebot findest du direkt unter dieser Analyse."
 
 function buildCourseRecommendation(memory: any): CourseRecommendation {
   const context = buildAnalysisContext(memory);
-
-  const rankedModules = schlummerwerkstattModules
-    .map((module) => ({
-      module,
-      score: scoreModule(module, memory, context),
-    }))
-    .filter((entry) => entry.score > 0)
-    .sort((a, b) => b.score - a.score);
-
-  const modules =
-    rankedModules.length > 0
-      ? rankedModules.slice(0, 3).map((entry) => entry.module)
-      : [
-          schlummerwerkstattModules.find((m) => m.id === "schlafdruck")!,
-          schlummerwerkstattModules.find((m) => m.id === "tagesstruktur")!,
-        ];
-
-  const todaySteps = modules.flatMap((module) => module.todayActions).slice(0, 4);
+  const modules = buildCourseModuleRecommendation(memory, context);
+  const todaySteps = getTodayActionTexts(
+    modules.map((module) => module.id)
+  ).slice(0, 4);
 
   const moduleList = modules
-    .map(
-      (module) =>
-        `• ${module.title} (${module.chapter}${module.timestamp ? `, ${module.timestamp}` : ""}): ${module.description}`
-    )
+    .map((module) => {
+      const chapter = module.primaryChapter;
+      const chapterLabel = chapter
+        ? `${chapter.title}${chapter.timestamp ? `, ${chapter.timestamp}` : ""}`
+        : module.roadmap.chapters[0]?.title ?? "";
+
+      const materials = [
+        module.roadmap.pdfs.length > 0
+          ? `PDF: ${module.roadmap.pdfs[0].title}`
+          : null,
+        module.roadmap.exercises.length > 0
+          ? `Übung: ${module.roadmap.exercises[0].title}`
+          : null,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+
+      return `• ${module.title} (${chapterLabel}${materials ? ` · ${materials}` : ""}): ${module.description}`;
+    })
     .join("\n");
 
   return {
@@ -274,7 +246,7 @@ Schreibe am Ende der Analyse:
 
 1. Erkläre in 2–4 Sätzen, warum genau diese Module zu den Antworten der Familie passen – mit Bezug auf die erkannten Herausforderungen.
 2. Gib 2–4 konkrete Handlungsschritte für HEUTE (aus den empfohlenen Modulen).
-3. Nenne optional Kapitel oder Zeitmarken aus der Schlummerwerkstatt.
+3. Nenne optional Kapitel, PDFs, Bonusmaterial oder Übungen aus der Schlummerwerkstatt.
 4. Verkaufe keine Kurse. Die Familie ist bereits in der Schlummerwerkstatt.
 
 Heutige Schritte als Orientierung (passe sie an die Familie an):
@@ -295,5 +267,4 @@ export function buildRecommendation(
   return buildPublicRecommendation(memory);
 }
 
-// Abwärtskompatibilität
 export type Recommendation = ModeRecommendation;
