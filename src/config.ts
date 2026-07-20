@@ -30,10 +30,13 @@ function isPublicHost(): boolean {
 }
 
 function modeFromEnv(): AppMode | undefined {
-  const envMode = import.meta.env.VITE_MIMI_MODE as AppMode | undefined;
-  return VALID_MODES.includes(envMode as AppMode)
-    ? (envMode as AppMode)
-    : undefined;
+  const raw = import.meta.env.VITE_MIMI_MODE;
+  if (typeof raw !== "string" || raw.trim() === "") {
+    return undefined;
+  }
+
+  const envMode = raw as AppMode;
+  return VALID_MODES.includes(envMode) ? envMode : undefined;
 }
 
 /**
@@ -42,7 +45,7 @@ function modeFromEnv(): AppMode | undefined {
  * Priority:
  * 1. Schlummerwerkstatt hostnames (e.g. mimi-schlummerwerkstatt.netlify.app)
  * 2. Public hostnames (e.g. mimi-schlafkompass.netlify.app)
- * 3. VITE_MIMI_MODE build-time override (local dev)
+ * 3. VITE_MIMI_MODE (set at build time via Netlify URL or env)
  * 4. public (default)
  */
 export function resolveAppMode(): AppMode {
@@ -57,8 +60,6 @@ export function resolveAppMode(): AppMode {
   return modeFromEnv() ?? "public";
 }
 
-export const MODE: AppMode = resolveAppMode();
-
 export function isPublicMode(): boolean {
   return resolveAppMode() === "public";
 }
@@ -66,3 +67,6 @@ export function isPublicMode(): boolean {
 export function isCourseMode(): boolean {
   return resolveAppMode() === "course";
 }
+
+/** @deprecated Use resolveAppMode() – kept for backwards compatibility */
+export const MODE: AppMode = resolveAppMode();

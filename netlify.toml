@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist"
 
+# Mode is resolved automatically:
+# - build time: vite.config.ts reads Netlify URL (schlummerwerkstatt → course)
+# - runtime: src/config.ts reads window.location.hostname
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
