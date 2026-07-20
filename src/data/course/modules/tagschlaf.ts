@@ -5,7 +5,25 @@ export const tagschlafModule: CourseModuleDefinition = {
   title: "Tagschlaf & Schläfchen",
   description:
     "Anzahl, Länge und Verteilung der Tagschläfchen altersgerecht anpassen.",
+  shortDescription:
+    "Anzahl, Länge und Verteilung der Tagschläfchen altersgerecht anpassen.",
   order: 5,
+  recommendWhen: [
+    "Die Schläfchen sind sehr kurz oder unregelmäßig.",
+    "Die Anzahl der Tagschläfchen passt möglicherweise nicht zum Alter.",
+    "Das Kind wirkt nach dem Aufwachen überdreht.",
+    "Der Tagschlaf beeinflusst den Nachtschlaf spürbar.",
+  ],
+  learningGoals: [
+    "Tagschlaf altersgerecht einordnen.",
+    "Anzahl und Länge der Schläfchen bewerten.",
+    "Zusammenhang zwischen Tagschlaf und Nachtschlaf verstehen.",
+    "Übermüdung durch unpassenden Tagschlaf erkennen.",
+  ],
+  relatedKnowledge: ["durchschlafen"],
+  nextModules: ["schlafdruck", "nachtschlaf", "abendroutine"],
+  priority: 5,
+  prerequisites: ["grundlagen", "schlafdruck"],
   todayActions: [
     {
       id: "tagschlaf-1",

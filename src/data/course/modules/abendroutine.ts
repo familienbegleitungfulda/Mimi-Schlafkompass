@@ -5,7 +5,25 @@ export const abendroutineModule: CourseModuleDefinition = {
   title: "Abendroutine & Einschlafen",
   description:
     "Eine passende Abendroutine gestalten und den Übergang in den Nachtschlaf unterstützen.",
+  shortDescription:
+    "Eine passende Abendroutine gestalten und den Übergang in den Nachtschlaf unterstützen.",
   order: 6,
+  recommendWhen: [
+    "Das Einschlafen am Abend dauert lange oder ist anstrengend.",
+    "Die Abendroutine wirkt unruhig oder zu kurz.",
+    "Einzelne Abendschritte reizen das Kind besonders.",
+    "Der Übergang in den Nachtschlaf ist schwierig.",
+  ],
+  learningGoals: [
+    "Eine passende Abendroutine gestalten.",
+    "Reizniveau und Dauer der Routine einschätzen.",
+    "Den Übergang in den Nachtschlaf unterstützen.",
+    "Einschlafbegleitung im Abend einordnen.",
+  ],
+  relatedKnowledge: ["durchschlafen"],
+  nextModules: ["nachtschlaf", "einschlafbegleitung"],
+  priority: 6,
+  prerequisites: ["grundlagen", "schlafdruck"],
   todayActions: [
     {
       id: "abendroutine-1",

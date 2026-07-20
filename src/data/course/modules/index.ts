@@ -1,5 +1,6 @@
 import { abendroutineModule } from "./abendroutine";
 import { einschlafbegleitungModule } from "./einschlafbegleitung";
+import { grundlagenModule } from "./grundlagen";
 import { nachtschlafModule } from "./nachtschlaf";
 import { reizverarbeitungModule } from "./reizverarbeitung";
 import { schlafdruckModule } from "./schlafdruck";
@@ -13,6 +14,7 @@ import type {
 } from "./types";
 
 export const allCourseModuleDefinitions: CourseModuleDefinition[] = [
+  grundlagenModule,
   schlafdruckModule,
   tagesstrukturModule,
   reizverarbeitungModule,
@@ -22,14 +24,24 @@ export const allCourseModuleDefinitions: CourseModuleDefinition[] = [
   einschlafbegleitungModule,
 ];
 
-export const courseModules: CourseModule[] = allCourseModuleDefinitions.map(
-  ({ id, title, description, order }) => ({
-    id,
-    title,
-    description,
-    order,
-  })
-);
+function toCourseModule(module: CourseModuleDefinition): CourseModule {
+  return {
+    id: module.id,
+    title: module.title,
+    description: module.description,
+    shortDescription: module.shortDescription,
+    order: module.order,
+    recommendWhen: module.recommendWhen,
+    learningGoals: module.learningGoals,
+    relatedKnowledge: module.relatedKnowledge,
+    nextModules: module.nextModules,
+    priority: module.priority,
+    prerequisites: module.prerequisites,
+  };
+}
+
+export const courseModules: CourseModule[] =
+  allCourseModuleDefinitions.map(toCourseModule);
 
 export const courseModuleMap = Object.fromEntries(
   allCourseModuleDefinitions.map((module) => [module.id, module])

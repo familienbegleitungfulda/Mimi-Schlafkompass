@@ -5,7 +5,25 @@ export const nachtschlafModule: CourseModuleDefinition = {
   title: "Nachtschlaf & nächtliches Aufwachen",
   description:
     "Nächtliches Aufwachen einordnen und bindungsorientiert begleiten.",
+  shortDescription:
+    "Nächtliches Aufwachen einordnen und bindungsorientiert begleiten.",
   order: 7,
+  recommendWhen: [
+    "Das Kind wacht nachts häufig auf.",
+    "Das Wiedereinschlafen dauert lange.",
+    "Die Nächte belasten die Familie spürbar.",
+    "Fragen zum Durchschlafen stehen im Vordergrund.",
+  ],
+  learningGoals: [
+    "Nächtliches Aufwachen altersgerecht einordnen.",
+    "Schlafzyklen und normales Aufwachen verstehen.",
+    "Bindungsorientiert bei nächtlichem Aufwachen begleiten.",
+    "Hilfe nachts beobachten und dokumentieren.",
+  ],
+  relatedKnowledge: ["durchschlafen", "familienbett"],
+  nextModules: ["einschlafbegleitung", "schlafdruck"],
+  priority: 7,
+  prerequisites: ["grundlagen"],
   todayActions: [
     {
       id: "nachtschlaf-1",

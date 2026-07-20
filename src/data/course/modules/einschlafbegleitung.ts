@@ -5,7 +5,25 @@ export const einschlafbegleitungModule: CourseModuleDefinition = {
   title: "Einschlafbegleitung (zurückhaltend)",
   description:
     "Einschlafhilfen verstehen – erst nach Schlafstruktur und Nervensystem betrachten.",
+  shortDescription:
+    "Einschlafhilfen verstehen – erst nach Schlafstruktur und Nervensystem betrachten.",
   order: 8,
+  recommendWhen: [
+    "Das Kind braucht immer dieselbe Hilfe zum Einschlafen und nachts.",
+    "Schlafstruktur und Nervensystem wurden bereits betrachtet.",
+    "Das Kind ist mindestens 6 Monate alt.",
+    "Die Familie leidet unter der aktuellen Einschlafsituation.",
+  ],
+  learningGoals: [
+    "Einschlafhilfen ohne Bewertung verstehen.",
+    "Schlafassoziationen zurückhaltend einordnen.",
+    "Bindungsorientiert begleiten statt abtrainieren.",
+    "Veränderungen erst nach den Grundlagen erwägen.",
+  ],
+  relatedKnowledge: ["durchschlafen", "schlaftraining"],
+  nextModules: ["nachtschlaf", "abendroutine"],
+  priority: 8,
+  prerequisites: ["grundlagen", "schlafdruck", "reizverarbeitung"],
   todayActions: [
     {
       id: "einschlafbegleitung-1",

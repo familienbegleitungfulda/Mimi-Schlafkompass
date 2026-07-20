@@ -5,7 +5,25 @@ export const schlafdruckModule: CourseModuleDefinition = {
   title: "Schlafdruck & Wachzeiten",
   description:
     "Altersgerechte Wachzeiten erkennen, Schlafdruck aufbauen und Müdigkeitszeichen besser deuten.",
+  shortDescription:
+    "Schlafdruck und Wachzeiten altersgerecht erkennen und Müdigkeitszeichen besser deuten.",
   order: 2,
+  recommendWhen: [
+    "Das Kind wirkt übermüdet oder unterfordert.",
+    "Die Wachzeiten passen möglicherweise nicht zum Alter.",
+    "Das Einschlafen dauert sehr lange oder gelingt kaum.",
+    "Tagschlaf und Nachtschlaf wirken unausgewogen.",
+  ],
+  learningGoals: [
+    "Schlafdruck verstehen und altersgerecht einordnen.",
+    "Müdigkeitszeichen früh erkennen.",
+    "Wachzeiten für das Alter einschätzen können.",
+    "Über- und Unterforderung am Schlafdruck erkennen.",
+  ],
+  relatedKnowledge: ["durchschlafen"],
+  nextModules: ["tagesstruktur", "tagschlaf", "abendroutine"],
+  priority: 2,
+  prerequisites: ["grundlagen"],
   todayActions: [
     {
       id: "schlafdruck-1",

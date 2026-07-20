@@ -5,7 +5,25 @@ export const reizverarbeitungModule: CourseModuleDefinition = {
   title: "Reizverarbeitung & Nervensystem",
   description:
     "Reize dosieren, sensorische Pausen einbauen und ein reguliertes Nervensystem unterstützen.",
+  shortDescription:
+    "Reize dosieren, Pausen einbauen und das Nervensystem regulieren.",
   order: 4,
+  recommendWhen: [
+    "Das Kind wirkt überreizt oder überdreht.",
+    "Es fällt schwer, zur Ruhe zu kommen.",
+    "Das Temperament ist als sensibel, high need oder reizoffen beschrieben.",
+    "Der Tag wirkt zu voll oder zu wenig strukturiert.",
+  ],
+  learningGoals: [
+    "Reize altersgerecht dosieren.",
+    "Sensorische Pausen im Alltag einbauen.",
+    "Über- und Unterforderung erkennen.",
+    "Das Nervensystem des Kindes unterstützen.",
+  ],
+  relatedKnowledge: [],
+  nextModules: ["schlafdruck", "tagesstruktur", "abendroutine"],
+  priority: 4,
+  prerequisites: ["grundlagen"],
   todayActions: [
     {
       id: "reizverarbeitung-1",

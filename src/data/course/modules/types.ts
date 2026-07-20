@@ -2,7 +2,14 @@ export interface CourseModuleDefinition {
   id: string;
   title: string;
   description: string;
+  shortDescription: string;
   order: number;
+  recommendWhen: string[];
+  learningGoals: string[];
+  relatedKnowledge: string[];
+  nextModules: string[];
+  priority?: number;
+  prerequisites?: string[];
   todayActions: ModuleTodayAction[];
   roadmap: ModuleRoadmapContent;
 }
@@ -51,5 +58,15 @@ export interface ModuleRoadmap extends ModuleRoadmapContent {
 
 export type CourseModule = Pick<
   CourseModuleDefinition,
-  "id" | "title" | "description" | "order"
+  | "id"
+  | "title"
+  | "description"
+  | "shortDescription"
+  | "order"
+  | "recommendWhen"
+  | "learningGoals"
+  | "relatedKnowledge"
+  | "nextModules"
+  | "priority"
+  | "prerequisites"
 >;

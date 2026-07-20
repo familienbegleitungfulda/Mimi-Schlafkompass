@@ -5,7 +5,25 @@ export const tagesstrukturModule: CourseModuleDefinition = {
   title: "Tagesstruktur & Vorhersehbarkeit",
   description:
     "Einen vorhersehbaren Tagesablauf gestalten und Übergänge für dein Kind planbar machen.",
+  shortDescription:
+    "Einen vorhersehbaren Tagesablauf gestalten und Übergänge planbar machen.",
   order: 3,
+  recommendWhen: [
+    "Der Tagesablauf wirkt unvorhersehbar oder chaotisch.",
+    "Übergänge zwischen Aktivitäten sind schwierig.",
+    "Das Kind reagiert empfindlich auf Veränderungen im Alltag.",
+    "Schlaf- und Essenszeiten variieren stark.",
+  ],
+  learningGoals: [
+    "Einen altersgerechten Tagesrhythmus gestalten.",
+    "Ankerpunkte im Tag etablieren.",
+    "Übergänge für das Kind planbar machen.",
+    "Vorhersehbarkeit als Schlüssel für Regulation nutzen.",
+  ],
+  relatedKnowledge: [],
+  nextModules: ["schlafdruck", "reizverarbeitung", "tagschlaf"],
+  priority: 3,
+  prerequisites: ["grundlagen"],
   todayActions: [
     {
       id: "tagesstruktur-1",
