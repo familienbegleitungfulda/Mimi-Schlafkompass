@@ -19,6 +19,7 @@ export default function ChatPage() {
 
   const [recommendedProducts, setRecommendedProducts] =
     useState<typeof allProducts>([]);
+  const [productReasons, setProductReasons] = useState<string[]>([]);
   const [recommendedModules, setRecommendedModules] = useState<
     ResolvedCourseModule[]
   >([]);
@@ -71,9 +72,11 @@ Wie alt ist dein Kind aktuell?`,
       if (analysisComplete) {
         if (answer.mode === "course") {
           setRecommendedProducts([]);
+          setProductReasons([]);
           setRecommendedModules(answer.modules);
         } else {
           setRecommendedProducts(answer.products);
+          setProductReasons(answer.productReasons);
           setRecommendedModules([]);
         }
       }
@@ -295,11 +298,39 @@ Wie alt ist dein Kind aktuell?`,
                     style={{
                       color: theme.mutedText,
                       lineHeight: 1.7,
-                      marginBottom: 20,
+                      marginBottom: productReasons.length > 0 ? 12 : 20,
                     }}
                   >
                     {product.description}
                   </p>
+
+                  {productReasons.length > 0 && (
+                    <div style={{ marginBottom: 20 }}>
+                      <strong
+                        style={{
+                          display: "block",
+                          marginBottom: 8,
+                          color: theme.bodyText,
+                        }}
+                      >
+                        Warum das zu euch passt:
+                      </strong>
+                      <ul
+                        style={{
+                          margin: 0,
+                          paddingLeft: 20,
+                          color: theme.bodyText,
+                          lineHeight: 1.6,
+                        }}
+                      >
+                        {productReasons.map((reason) => (
+                          <li key={reason} style={{ marginBottom: 6 }}>
+                            {reason}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   <button
                     onClick={() => window.open(product.url, "_blank")}
@@ -326,6 +357,7 @@ Wie alt ist dein Kind aktuell?`,
               productId={recommendedProducts[0].id}
               age={String(getMimiMemory().age ?? "")}
               sleepAssociation={isPossibleSleepAssociation(getMimiMemory())}
+              profile={getMimiMemory()}
               theme={theme}
             />
           </div>

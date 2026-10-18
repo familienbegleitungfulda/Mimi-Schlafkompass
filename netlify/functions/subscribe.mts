@@ -2,7 +2,8 @@ import { randomBytes } from "node:crypto";
 import type { Context } from "@netlify/functions";
 import { getStore } from "@netlify/blobs";
 import { products } from "../../src/data/products";
-import { schlummerwerkstattIdForAge } from "../../src/data/childAge";
+import { isPossibleSleepAssociation } from "../../src/engine/associationEngine";
+import { buildProductReasons, selectPublicProductId } from "../../src/engine/productSelection";
 import {
   checkRateLimit,
   errorResponse,
@@ -27,15 +28,31 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 const REPORT_STORE = "auswertungen";
 
-function resolveProduct(productId: unknown, age: string): ReportProduct {
-  const byId = products.find((p) => p.id === productId);
+const MAX_PROFILE_FIELDS = 40;
+const MAX_PROFILE_VALUE = 400;
+
+/** Schlafprofil aus dem Chat – nur kurze Textfelder werden übernommen. */
+function sanitizeProfile(raw: unknown): Record<string, string> {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {};
+  const profile: Record<string, string> = {};
+  for (const [key, value] of Object.entries(raw).slice(0, MAX_PROFILE_FIELDS)) {
+    if (/^[A-Za-z]{1,40}$/.test(key) && typeof value === "string" && value.trim()) {
+      profile[key] = value.trim().slice(0, MAX_PROFILE_VALUE);
+    }
+  }
+  return profile;
+}
+
+function resolveProduct(productId: unknown, profile: Record<string, string>): ReportProduct {
   const product =
-    byId ?? products.find((p) => p.id === schlummerwerkstattIdForAge(age))!;
+    products.find((p) => p.id === productId) ??
+    products.find((p) => p.id === selectPublicProductId(profile))!;
   return {
     id: product.id,
     title: product.title,
     description: product.description,
     url: product.url,
+    reasons: buildProductReasons(product.id, profile),
   };
 }
 
@@ -93,9 +110,14 @@ export default async (req: Request, context: Context) => {
   }
 
   try {
-    const product = resolveProduct(body.productId, age);
+    const profile = sanitizeProfile(body.profile);
+    if (!profile.age && age) profile.age = age;
+    const product = resolveProduct(body.productId, profile);
     const report = await generateReport(validated.messages, product, age, {
-      sleepAssociation: body.sleepAssociation === true,
+      sleepAssociation:
+        Object.keys(profile).length > 1
+          ? isPossibleSleepAssociation(profile)
+          : body.sleepAssociation === true,
     });
     const pdf = buildReportPdf({ vorname, report, product });
 

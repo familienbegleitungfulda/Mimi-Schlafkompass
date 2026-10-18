@@ -18,6 +18,8 @@ export type ReportProduct = {
   title: string;
   description: string;
   url: string;
+  /** 2–4 persönliche Gründe für die Empfehlung (Karte im PDF). */
+  reasons?: string[];
 };
 
 export type Report = {
@@ -31,7 +33,7 @@ export type Report = {
 
 function buildReportPrompt(product: ReportProduct, age: string, sleepAssociation: boolean): string {
   return `
-Du bist Mimi, die virtuelle Assistentin von Maya Löbel (Familienbegleitung Löbel).
+Du bist Mimi, die virtuelle Assistentin von Maya Löbel (Familienbegleitung Fulda).
 
 Du hast mit Eltern gerade eine Schlafanalyse im Chat geführt. Jetzt schreibst du daraus eine ausführliche, schriftliche Auswertung (ca. 1–2 Seiten), die die Eltern als PDF bekommen.
 
@@ -64,7 +66,7 @@ Antworte ausschließlich als gültiges JSON in genau diesem Schema:
   "zusammenfassung": "kurze Zusammenfassung eurer Schlafsituation mit Alter des Kindes (4–6 Sätze)",
   "ursachen": ["2–4 mögliche Ursachen, je 1–3 Sätze, vorsichtig formuliert"],
   "tipps": [{ "titel": "kurzer Titel", "text": "konkreter, sofort umsetzbarer Tipp für die nächsten Tage, 2–4 Sätze, direkt auf die Familie bezogen" }],
-  "empfehlungBegruendung": "2–3 Sätze, warum ${product.title} jetzt gut weiterhilft und die Tipps vertieft"
+  "empfehlungBegruendung": "1–2 Sätze, warum ${product.title} jetzt gut weiterhilft und die Tipps vertieft"
 }
 
 "tipps" enthält 3 bis 5 Einträge.
