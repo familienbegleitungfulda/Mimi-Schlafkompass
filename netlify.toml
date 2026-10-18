@@ -5,9 +5,13 @@
 [functions]
   directory = "netlify/functions"
   node_bundler = "esbuild"
+  # jsPDF loads optional helpers at runtime – ship it as a regular dependency.
+  external_node_modules = ["jspdf"]
 
 # OpenAI requests go through /.netlify/functions/chat in production.
-# Set OPENAI_API_KEY or VITE_OPENAI_API_KEY in Netlify environment variables.
+# Set OPENAI_API_KEY (server-side only) in Netlify environment variables.
+# VITE_OPENAI_API_KEY is still accepted as a fallback by the functions.
+# Brevo: BREVO_API_KEY, BREVO_LIST_ID, BREVO_DOI_TEMPLATE_ID, BREVO_MAIL_TEMPLATE_ID, BREVO_REDIRECT_URL
 
 [[redirects]]
   from = "/*"

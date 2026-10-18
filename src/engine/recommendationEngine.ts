@@ -7,10 +7,12 @@ import {
   type ResolvedCourseModule,
 } from "../data/course";
 import { products } from "../data/products";
+import { schlummerwerkstattIdForAge } from "../data/childAge";
 import { detectMainCause } from "./analysisEngine";
 import {
   getBedtimeSupport,
   getNightSupport,
+  hasComplexHealthTopic,
   hasNervousSystemIssues,
   hasStructureIssues,
   isPossibleSleepAssociation,
@@ -81,7 +83,7 @@ function collectDetectedIssues(memory: any): string[] {
 
   if (isPossibleSleepAssociation(memory)) {
     issues.push(
-      "Mögliche Schlafassoziation – nur zurückhaltend erwähnen, nicht als Hauptproblem"
+      "Einschlafassoziation erkannt (dieselbe Einschlafhilfe abends und nachts) – Schwerpunkt dieser Analyse, behutsam benennen"
     );
   }
 
@@ -126,6 +128,48 @@ function buildPublicRecommendation(memory: any): PublicRecommendation {
   const context = buildAnalysisContext(memory);
   const cause = detectMainCause(memory);
 
+  if (hasComplexHealthTopic(memory)) {
+    const product = products.find((p) => p.id === "beratung");
+
+    return {
+      mode: "public",
+      ...context,
+      product,
+      courseFocus: [
+        "individuelle Schlafsituation",
+        "gesundheitliche Besonderheiten",
+        "bindungsorientierte Begleitung",
+        "maßgeschneiderte Lösungen",
+      ],
+      guidance: buildPublicProductBridge(
+        "Gesundheitliche Besonderheiten und individuelle Schlafherausforderungen – wann persönliche Begleitung sinnvoll ist."
+      ),
+    };
+  }
+
+  // Einschlafassoziation hat Vorrang vor Mini-Kurs Struktur & Überreizung
+  // und Papa-Kurs: unter 18 Monaten Schlummerwerkstatt 1, ab 18 Monaten 2.
+  if (isPossibleSleepAssociation(memory)) {
+    const product = products.find(
+      (p) => p.id === schlummerwerkstattIdForAge(memory.age)
+    );
+
+    return {
+      mode: "public",
+      ...context,
+      product,
+      courseFocus: [
+        "Einschlafassoziation verstehen",
+        "Einschlafhilfe behutsam und bindungsorientiert verändern",
+        "Schlafstruktur passend dazu gestalten",
+        "nachts leichter weiterschlafen",
+      ],
+      guidance: buildPublicProductBridge(
+        "Einschlafassoziation: Das Kind braucht abends und nachts dieselbe Einschlafhilfe. Benenne das behutsam als Schwerpunkt (ohne Schritt-für-Schritt-Anleitung zum Abgewöhnen) und ergänze passende Hinweise zur Schlafstruktur."
+      ),
+    };
+  }
+
   if (cause.id === "sleepPressure" || hasStructureIssues(memory)) {
     const product = products.find((p) => p.id === "struktur");
 
@@ -142,11 +186,7 @@ function buildPublicRecommendation(memory: any): PublicRecommendation {
         "leichter in den Schlaf finden",
       ],
       guidance: buildPublicProductBridge(
-        `Wachzeiten, Schlafdruck, Tagschlaf, Tagesstruktur und Reizdosierung.${
-          isPossibleSleepAssociation(memory)
-            ? " Falls eine mögliche Schlafassoziation erkennbar ist: höchstens kurz erwähnen, dass das erst später relevant werden könnte – Fokus bleibt auf Schlafstruktur."
-            : ""
-        }`
+        "Wachzeiten, Schlafdruck, Tagschlaf, Tagesstruktur und Reizdosierung."
       ),
     };
   }
@@ -171,26 +211,8 @@ function buildPublicRecommendation(memory: any): PublicRecommendation {
     };
   }
 
-  if (memory.health && /reflux|zungenband|allerg|schmerz|atm/i.test(memory.health)) {
-    const product = products.find((p) => p.id === "beratung");
-
-    return {
-      mode: "public",
-      ...context,
-      product,
-      courseFocus: [
-        "individuelle Schlafsituation",
-        "gesundheitliche Besonderheiten",
-        "bindungsorientierte Begleitung",
-        "maßgeschneiderte Lösungen",
-      ],
-      guidance: buildPublicProductBridge(
-        "Gesundheitliche Besonderheiten und individuelle Schlafherausforderungen – wann persönliche Begleitung sinnvoll ist."
-      ),
-    };
-  }
-
-  const product = products.find((p) => p.id === "schlummerwerkstatt");
+  const swId = schlummerwerkstattIdForAge(memory.age);
+  const product = products.find((p) => p.id === swId);
 
   return {
     mode: "public",

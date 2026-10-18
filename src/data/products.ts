@@ -36,11 +36,25 @@ export const products = [
     },
   
     {
-      id: "schlummerwerkstatt",
-      title: "Schlummerwerkstatt",
-      description:
-        "Mayas umfassender Schlafkurs für Babys und Kleinkinder.",
-      url: "https://familienbegleitung-fulda.tentary.com/p/e0luMj",
+      id: "schlummerwerkstatt1",
+      title: "Schlummerwerkstatt 1",
+      description: "Mayas großer Schlafkurs für Babys bis 18 Monate.",
+      url: "https://www.familienbegleitung-fulda.de/Schlummerwerkstatt1/schlummerwerkstatt-landingpage.html",
+      when: [
+        "Mehrere Ursachen",
+        "Komplexe Situation",
+        "Schlafanalyse",
+        "Einschlafassoziation",
+        "Schlafassoziation"
+    
+      ]
+    },
+
+    {
+      id: "schlummerwerkstatt2",
+      title: "Schlummerwerkstatt 2",
+      description: "Mayas Schlafkurs für Kinder von 18 bis 36 Monaten.",
+      url: "https://www.familienbegleitung-fulda.de/SchlummerwerkstattVol2/schlummerwerkstatt-vol2-landingpage.html",
       when: [
         "Mehrere Ursachen",
         "Komplexe Situation",
@@ -56,7 +70,7 @@ export const products = [
       title: "1:1 Schlafberatung",
       description:
         "Individuelle bindungsorientierte Schlafberatung für komplexe Schlafsituationen.",
-      url: "https://familienbegleitung-fulda.tentary.com/p/72qcPR",
+      url: "https://familienbegleitung-fulda.mytentary.com/p/72qcPR",
       when: [
         "Gesundheit",
         "High Need",
