@@ -27,9 +27,9 @@ const MARGIN = 18;
 const CONTENT_W = PAGE_W - MARGIN * 2;
 const TOP = 20;
 const BOTTOM = PAGE_H - 24;
-const PAD = 8;
+const PAD = 6;
 const INNER_W = CONTENT_W - PAD * 2;
-const CARD_GAP = 7;
+const CARD_GAP = 5;
 const RADIUS = 5;
 const PT = 0.3528; // mm pro Punkt
 
@@ -97,14 +97,14 @@ export function buildReportPdf(input: {
     opts: { f?: Font; size?: number; color?: RGB; indent?: number; width?: number; gap?: number; keep?: boolean; lineFactor?: number } = {}
   ): Block[] => {
     const f = opts.f ?? "body";
-    const size = opts.size ?? 10.5;
+    const size = opts.size ?? 10;
     const color = opts.color ?? TEXT;
     const indent = opts.indent ?? 0;
-    const lineH = size * PT * (opts.lineFactor ?? 1.55);
+    const lineH = size * PT * (opts.lineFactor ?? 1.45);
     font(f, size, color);
     const lines: string[] = doc.splitTextToSize(clean(text), (opts.width ?? INNER_W) - indent);
     return lines.map((line, i) => ({
-      h: lineH + (i === lines.length - 1 ? (opts.gap ?? 3) : 0),
+      h: lineH + (i === lines.length - 1 ? (opts.gap ?? 2.5) : 0),
       keepWithNext: opts.keep && i < lines.length - 1,
       draw: (x, by) => {
         font(f, size, color);
@@ -114,29 +114,47 @@ export function buildReportPdf(input: {
   };
 
   const cardTitle = (text: string, color: RGB = BLUE): Block => ({
-    h: 26 * PT * 1.05 + 3,
+    h: 21 * PT * 1.05 + 2,
     keepWithNext: true,
     draw: (x, by) => {
-      font("title", 26, color);
+      font("title", 21, color);
       doc.text(clean(text), x, by, { baseline: "top" });
     },
   });
+
+  const cardHeight = (blocks: Block[], pad = PAD) => blocks.reduce((sum, b) => sum + b.h, 0) + pad * 2;
+
+  /** Aufzählung mit grünem Punkt; jeder Punkt bleibt ganz. */
+  const bulletBlocks = (items: string[], lastGap = 0): Block[] =>
+    items.flatMap((item, i) => {
+      const lines = textBlocks(item, { indent: 5.5, keep: true, gap: i === items.length - 1 ? lastGap : 2.5 });
+      const first = lines[0];
+      lines[0] = {
+        ...first,
+        draw: (x, by) => {
+          doc.setFillColor(...GREEN);
+          doc.circle(x + 1.5, by + 2.3, 1.1, "F");
+          first.draw(x, by);
+        },
+      };
+      return lines;
+    });
 
   const keepTogether = (blocks: Block[]): Block[] =>
     blocks.map((b, i) => ({ ...b, keepWithNext: i < blocks.length - 1 || b.keepWithNext }));
 
   /**
    * Zeichnet eine abgerundete Karte. Passt sie nicht mehr auf die Seite, beginnt
-   * sie auf der nächsten. Lange Karten (mehr als eine halbe Seite) werden statt-
-   * dessen zwischen zwei Bausteinen geteilt – jede Seite bekommt dann eine
-   * eigene, geschlossene Karte; Absätze und Tipps bleiben ganz.
+   * sie auf der nächsten. Größere Karten werden stattdessen zwischen zwei
+   * Bausteinen geteilt, wenn noch genug Platz frei ist. Jede Seite bekommt dann
+   * eine eigene, geschlossene Karte; Absätze und Tipps bleiben ganz.
    */
   const card = (blocks: Block[], style: { fill?: RGB; border?: RGB; pad?: number } = {}) => {
     const pad = style.pad ?? PAD;
-    const total = blocks.reduce((sum, b) => sum + b.h, 0) + pad * 2;
+    const total = cardHeight(blocks, pad);
     const remaining = BOTTOM - y;
-    const isLong = total > (BOTTOM - TOP) * 0.5;
-    if (total > remaining && total <= BOTTOM - TOP && (!isLong || remaining < 60)) newPage();
+    const splittable = total >= 80 && remaining >= 50;
+    if (total > remaining && total <= BOTTOM - TOP && !splittable) newPage();
 
     let i = 0;
     while (i < blocks.length) {
@@ -181,23 +199,23 @@ export function buildReportPdf(input: {
   // --- Titelbereich --------------------------------------------------------
 
   font("bold", 8, MUTED);
-  doc.text("MIMIS SCHLAFKOMPASS · FAMILIENBEGLEITUNG LÖBEL", MARGIN, y, { baseline: "top", charSpace: 0.6 });
-  y += 7;
+  doc.text("MIMIS SCHLAFKOMPASS · FAMILIENBEGLEITUNG FULDA", MARGIN, y, { baseline: "top", charSpace: 0.6 });
+  y += 6;
 
   doc.setFillColor(...GREEN);
   doc.roundedRect(MARGIN, y, 14, 1.2, 0.6, 0.6, "F");
   y += 4;
 
-  font("title", 44, BLUE);
+  font("title", 36, BLUE);
   doc.text("Eure Schlafauswertung", MARGIN, y, { baseline: "top" });
-  y += 44 * PT * 1.05 + 3;
+  y += 36 * PT * 1.05 + 2;
 
   const subtitle = [`Für ${clean(vorname)}`, report.kindAlter ? `Alter deines Kindes: ${clean(report.kindAlter)}` : ""]
     .filter(Boolean)
     .join("  ·  ");
-  font("bold", 12, TEXT);
+  font("bold", 11, TEXT);
   doc.text(doc.splitTextToSize(subtitle, CONTENT_W)[0] ?? "", MARGIN, y, { baseline: "top" });
-  y += 12 * PT * 1.5;
+  y += 11 * PT * 1.5;
 
   const date = (input.createdAt ?? new Date()).toLocaleDateString("de-DE", {
     day: "2-digit",
@@ -205,20 +223,20 @@ export function buildReportPdf(input: {
     year: "numeric",
     timeZone: "Europe/Berlin",
   });
-  font("body", 9.5, MUTED);
+  font("body", 9, MUTED);
   doc.text(`Erstellt von Mimi am ${date}`, MARGIN, y, { baseline: "top" });
-  y += 9.5 * PT * 1.5 + 3;
+  y += 9 * PT * 1.5 + 2.5;
 
   if (report.schwerpunkt) {
     const label = `Schwerpunkt: ${clean(report.schwerpunkt)}`;
-    font("bold", 9.5, BLUE);
+    font("bold", 9, BLUE);
     const w = Math.min(doc.getTextWidth(label) + 10, CONTENT_W);
     doc.setFillColor(...BLUE_LIGHT);
-    doc.roundedRect(MARGIN, y, w, 8, 4, 4, "F");
-    doc.text(label, MARGIN + 5, y + 4, { baseline: "middle", maxWidth: CONTENT_W - 10 });
-    y += 8;
+    doc.roundedRect(MARGIN, y, w, 7, 3.5, 3.5, "F");
+    doc.text(label, MARGIN + 5, y + 3.5, { baseline: "middle", maxWidth: CONTENT_W - 10 });
+    y += 7;
   }
-  y += 8;
+  y += 6;
 
   // --- Eure Situation ------------------------------------------------------
 
@@ -227,20 +245,7 @@ export function buildReportPdf(input: {
   // --- Mögliche Ursachen ---------------------------------------------------
 
   if (report.ursachen.length > 0) {
-    const blocks: Block[] = [cardTitle("Mögliche Ursachen")];
-    report.ursachen.forEach((cause, i) => {
-      const lines = textBlocks(cause, { indent: 6, keep: true, gap: i === report.ursachen.length - 1 ? 0 : 3.5 });
-      const first = lines[0];
-      lines[0] = {
-        ...first,
-        draw: (x, by) => {
-          doc.setFillColor(...GREEN);
-          doc.circle(x + 1.6, by + 2.4, 1.2, "F");
-          first.draw(x, by);
-        },
-      };
-      blocks.push(...lines);
-    });
+    const blocks: Block[] = [cardTitle("Mögliche Ursachen"), ...bulletBlocks(report.ursachen)];
     card(blocks, { fill: CARD });
   }
 
@@ -248,21 +253,21 @@ export function buildReportPdf(input: {
 
   if (report.tipps.length > 0) {
     const blocks: Block[] = [cardTitle("Tipps für die nächsten Tage")];
-    const indent = 12;
+    const indent = 10;
     report.tipps.forEach((tip, i) => {
       const last = i === report.tipps.length - 1;
       const tipBlocks = keepTogether([
-        ...(tip.titel ? textBlocks(tip.titel, { f: "extra", size: 11, indent, gap: 1 }) : []),
-        ...textBlocks(tip.text, { indent, gap: last ? 0 : 5 }),
+        ...(tip.titel ? textBlocks(tip.titel, { f: "extra", size: 10.5, indent, gap: 0.5 }) : []),
+        ...textBlocks(tip.text, { indent, gap: last ? 0 : 3.5 }),
       ]);
       const first = tipBlocks[0];
       tipBlocks[0] = {
         ...first,
         draw: (x, by) => {
           doc.setFillColor(...GREEN);
-          doc.circle(x + 3.8, by + 3, 3.8, "F");
-          font("extra", 10.5, WHITE);
-          doc.text(String(i + 1), x + 3.8, by + 3.1, { align: "center", baseline: "middle" });
+          doc.circle(x + 3.3, by + 2.7, 3.3, "F");
+          font("extra", 9.5, WHITE);
+          doc.text(String(i + 1), x + 3.3, by + 2.8, { align: "center", baseline: "middle" });
           first.draw(x, by);
         },
       };
@@ -274,43 +279,54 @@ export function buildReportPdf(input: {
   // --- Mayas Empfehlung für euch -------------------------------------------
 
   const buttonLabel = "Zum Angebot  »";
-  card(
-    keepTogether([
-      cardTitle("Mayas Empfehlung für euch", GREEN_DARK),
-      ...textBlocks(product.title, { f: "extra", size: 13, color: TEXT, gap: 2 }),
-      ...textBlocks(report.empfehlungBegruendung || product.description, { gap: 5 }),
-      {
-        h: 11,
-        draw: (x, by) => {
-          font("extra", 11, WHITE);
-          const w = doc.getTextWidth(buttonLabel) + 16;
-          doc.setFillColor(...BLUE);
-          doc.roundedRect(x, by, w, 11, 5.5, 5.5, "F");
-          doc.text(buttonLabel, x + w / 2, by + 5.6, { align: "center", baseline: "middle" });
-          doc.link(x, by, w, 11, { url: product.url });
-        },
+  const reasons = (product.reasons ?? []).filter(Boolean);
+  const recommendation = keepTogether([
+    cardTitle("Mayas Empfehlung für euch", GREEN_DARK),
+    ...textBlocks(product.title, { f: "extra", size: 12, color: TEXT, gap: 1.5 }),
+    ...(reasons.length > 0
+      ? [
+          ...textBlocks("Warum das zu euch passt:", { f: "bold", gap: 1.5 }),
+          ...bulletBlocks(reasons, 4),
+        ]
+      : textBlocks(report.empfehlungBegruendung || product.description, { gap: 4 })),
+    {
+      h: 10,
+      draw: (x, by) => {
+        font("extra", 10.5, WHITE);
+        const w = doc.getTextWidth(buttonLabel) + 16;
+        doc.setFillColor(...BLUE);
+        doc.roundedRect(x, by, w, 10, 5, 5, "F");
+        doc.text(buttonLabel, x + w / 2, by + 5.1, { align: "center", baseline: "middle" });
+        doc.link(x, by, w, 10, { url: product.url });
       },
-    ]),
-    { fill: GREEN_LIGHT, border: GREEN }
-  );
+    },
+  ]);
 
   // --- Persönlicher Abschluss und Hinweis ----------------------------------
 
-  card(
-    keepTogether([
-      ...textBlocks("Ich wünsche euch ruhige Nächte!", { f: "bold", size: 13, gap: 0 }),
-      {
-        h: 20,
-        draw: (x, by) => {
-          font("script", 48, GREEN_DARK);
-          doc.text("Maya", x + 2, by + 1, { baseline: "top" });
-        },
+  const closing = keepTogether([
+    ...textBlocks("Ich wünsche euch ruhige Nächte!", { f: "bold", size: 12, gap: 0 }),
+    {
+      h: 15,
+      draw: (x, by) => {
+        font("script", 38, GREEN_DARK);
+        doc.text("Maya", x + 2, by + 1, { baseline: "top" });
       },
-    ]),
-    { pad: 2 }
-  );
+    },
+  ]);
+  const disclaimer = textBlocks(REPORT_DISCLAIMER, { size: 8, color: MUTED, gap: 0 });
 
-  card(textBlocks(REPORT_DISCLAIMER, { size: 8.5, color: MUTED, gap: 0 }), { fill: CARD_SOFT, pad: 5 });
+  // Abschluss und Hinweis nie allein auf einer Seite: Passen sie nicht mehr
+  // hinter die Empfehlung, wandert die Empfehlung mit auf die neue Seite.
+  const recH = cardHeight(recommendation);
+  const tailH = cardHeight(closing, 2) + CARD_GAP + cardHeight(disclaimer, 5);
+  if (y + recH <= BOTTOM && y + recH + CARD_GAP + tailH > BOTTOM && recH + CARD_GAP + tailH <= BOTTOM - TOP) {
+    newPage();
+  }
+
+  card(recommendation, { fill: GREEN_LIGHT, border: GREEN });
+  card(closing, { pad: 2 });
+  card(disclaimer, { fill: CARD_SOFT, pad: 5 });
 
   // --- Fußzeile auf jeder Seite --------------------------------------------
 

@@ -89,36 +89,45 @@ export function isSameExclusiveSupport(
 
 const NO_SUPPORT = /^\s*(nein|keine?|ohne|nichts|alleine?|selbst(ständig)?)(?![a-zäöüß])/i;
 
-const FREQUENT_NIGHT_WAKING =
-  /jede(n)? stunde|stündlich|häufig|oft|mehrmals|ständig|sehr viel|alle \d|dauernd|\b([2-9]|1\d)\s*(-\s*\d+\s*)?(x|mal)|zwei|drei|vier|fünf/i;
+/** Hilfen, die als eindeutige Schlafassoziation zählen (ohne Schnuller und Kinderwagen). */
+const ASSOCIATION_SUPPORT_TYPES = new Set(["brust", "flasche", "tragen", "ball", "federwiege", "kuscheln"]);
 
 /**
- * Einschlafassoziation: Das Kind schläft mit einer bestimmten Hilfe ein
- * (Stillen, Flasche, Tragen, Wippen, Federwiege, Schnuller, Körperkontakt)
- * und braucht nachts dieselbe Hilfe zum Weiterschlafen. Ist die Hilfe nachts
- * nicht ausdrücklich genannt, reicht häufiges nächtliches Aufwachen
- * (bzw. nächtliches Stillen/Flasche bei Stillen/Flasche als Einschlafhilfe).
+ * Eindeutige Einschlafassoziation: Das Kind schläft nur mit einer bestimmten
+ * Hilfe ein (Stillen, Flasche, Tragen, Wippen, Federwiege, Körperkontakt) UND
+ * braucht nachts ausdrücklich dieselbe Hilfe zum Weiterschlafen. Häufiges
+ * Aufwachen allein reicht nicht – dann bleibt es unklar (siehe
+ * isUnclearSleepAssociation) und Mimi fragt lieber nach.
  */
 export function isPossibleSleepAssociation(memory: any): boolean {
   const bedtime = getBedtimeSupport(memory);
   if (NO_SUPPORT.test(bedtime)) return false;
   const supportType = detectSupportType(bedtime);
-  if (!supportType) return false;
+  if (!supportType || !ASSOCIATION_SUPPORT_TYPES.has(supportType)) return false;
+  if (!mentionsAlways(bedtime) && !isSingleSupportType(bedtime)) return false;
 
   if (isFeedingSupport(supportType) && isUnder6Months(memory)) {
     return false;
   }
 
   const night = getNightSupport(memory);
+  if (NO_SUPPORT.test(night)) return false;
   const nightType = detectSupportType(night);
   if (nightType) return nightType === supportType;
 
   const nightFeeding = String(memory.nightFeeding ?? "");
-  if (isFeedingSupport(supportType) && detectSupportType(nightFeeding) === supportType) {
-    return true;
-  }
+  return isFeedingSupport(supportType) && detectSupportType(nightFeeding) === supportType;
+}
 
-  return FREQUENT_NIGHT_WAKING.test(String(memory.nightWakeups ?? ""));
+/** Einschlafhilfe genannt, aber offen, ob nachts dieselbe Hilfe nötig ist. */
+export function isUnclearSleepAssociation(memory: any): boolean {
+  if (isPossibleSleepAssociation(memory)) return false;
+  const bedtime = getBedtimeSupport(memory);
+  if (!bedtime || NO_SUPPORT.test(bedtime)) return false;
+  const supportType = detectSupportType(bedtime);
+  if (!supportType || !ASSOCIATION_SUPPORT_TYPES.has(supportType)) return false;
+  const night = getNightSupport(memory);
+  return !night && !String(memory.nightFeeding ?? "").trim();
 }
 
 const NO_HEALTH_TOPIC = /^\s*(nein|nö|keine?|nichts|gesund|unauffällig|alles (ok|gut|in ordnung))(?![a-zäöüß])/i;

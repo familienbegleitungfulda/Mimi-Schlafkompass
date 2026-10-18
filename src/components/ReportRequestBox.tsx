@@ -7,6 +7,8 @@ type Props = {
   productId: string;
   age: string;
   sleepAssociation: boolean;
+  /** Schlafprofil aus dem Gespräch – daraus entstehen die Gründe im PDF. */
+  profile: Record<string, unknown>;
   theme: MimiTheme;
 };
 
@@ -15,7 +17,7 @@ type Status = "idle" | "loading" | "success" | "error";
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 const PRIVACY_URL = "https://familienbegleitung-fulda.de/datenschutz/";
 
-export default function ReportRequestBox({ messages, productId, age, sleepAssociation, theme }: Props) {
+export default function ReportRequestBox({ messages, productId, age, sleepAssociation, profile, theme }: Props) {
   const [vorname, setVorname] = useState("");
   const [email, setEmail] = useState("");
   const [consent, setConsent] = useState(false);
@@ -51,6 +53,7 @@ export default function ReportRequestBox({ messages, productId, age, sleepAssoci
           productId,
           age,
           sleepAssociation,
+          profile,
           messages: messages
             .filter((m) => m.role === "user" || m.role === "assistant")
             .map((m) => ({ role: m.role, content: m.content })),

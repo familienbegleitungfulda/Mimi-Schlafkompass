@@ -18,6 +18,7 @@ import { sleepNeeds } from "../data/sleepNeeds";
 import { shouldAnalyse } from "../engine/reasoningEngine";
 import type { ResolvedCourseModule } from "../data/course";
 import { products } from "../data/products";
+import { buildProductReasons } from "../engine/productSelection";
 import { courseKnowledgeBase, courseModules } from "../data/course";
 
 /**
@@ -62,6 +63,8 @@ ${JSON.stringify(courseModules, null, 2)}
 export type MimiResponse = {
   message: string;
   products: (typeof products)[number][];
+  /** 2–4 persönliche Gründe zur Produktkarte. */
+  productReasons: string[];
   modules: ResolvedCourseModule[];
   mode: AppMode;
 };
@@ -152,6 +155,9 @@ ${buildAnalysisEndInstructions(recommendation, reasoning.ready)}
   return {
     message: response.choices[0].message.content ?? "",
     products: recommendedProducts,
+    productReasons: recommendedProducts[0]
+      ? buildProductReasons(recommendedProducts[0].id, memory)
+      : [],
     modules: recommendedModules,
     mode,
   };
