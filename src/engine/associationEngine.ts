@@ -2,9 +2,10 @@ const SUPPORT_PATTERNS: Record<string, RegExp> = {
   brust: /brust|still/i,
   flasche: /flasche|flaschen/i,
   tragen: /tragen|trage|getragen/i,
-  ball: /pezziball|ball|wippe/i,
+  ball: /pezziball|ball|wippe|wippen|schaukel/i,
+  federwiege: /federwiege|hängematte/i,
   schnuller: /schnuller/i,
-  kuscheln: /kuschel|körperkontakt/i,
+  kuscheln: /kuschel|körperkontakt|auf (mir|mama|papa|dem bauch|der brust)|im arm|hautkontakt/i,
   wagen: /kinderwagen|wagen/i,
 };
 
@@ -86,13 +87,21 @@ export function isSameExclusiveSupport(
   return alwaysIndicated;
 }
 
+const NO_SUPPORT = /^\s*(nein|keine?|ohne|nichts|alleine?|selbst(ständig)?)(?![a-zäöüß])/i;
+
+const FREQUENT_NIGHT_WAKING =
+  /jede(n)? stunde|stündlich|häufig|oft|mehrmals|ständig|sehr viel|alle \d|dauernd|\b([2-9]|1\d)\s*(-\s*\d+\s*)?(x|mal)|zwei|drei|vier|fünf/i;
+
+/**
+ * Einschlafassoziation: Das Kind schläft mit einer bestimmten Hilfe ein
+ * (Stillen, Flasche, Tragen, Wippen, Federwiege, Schnuller, Körperkontakt)
+ * und braucht nachts dieselbe Hilfe zum Weiterschlafen. Ist die Hilfe nachts
+ * nicht ausdrücklich genannt, reicht häufiges nächtliches Aufwachen
+ * (bzw. nächtliches Stillen/Flasche bei Stillen/Flasche als Einschlafhilfe).
+ */
 export function isPossibleSleepAssociation(memory: any): boolean {
   const bedtime = getBedtimeSupport(memory);
-  const night = getNightSupport(memory);
-
-  if (!bedtime || !night) return false;
-  if (!isSameExclusiveSupport(bedtime, night)) return false;
-
+  if (NO_SUPPORT.test(bedtime)) return false;
   const supportType = detectSupportType(bedtime);
   if (!supportType) return false;
 
@@ -100,7 +109,32 @@ export function isPossibleSleepAssociation(memory: any): boolean {
     return false;
   }
 
-  return true;
+  const night = getNightSupport(memory);
+  const nightType = detectSupportType(night);
+  if (nightType) return nightType === supportType;
+
+  const nightFeeding = String(memory.nightFeeding ?? "");
+  if (isFeedingSupport(supportType) && detectSupportType(nightFeeding) === supportType) {
+    return true;
+  }
+
+  return FREQUENT_NIGHT_WAKING.test(String(memory.nightWakeups ?? ""));
+}
+
+const NO_HEALTH_TOPIC = /^\s*(nein|nö|keine?|nichts|gesund|unauffällig|alles (ok|gut|in ordnung))(?![a-zäöüß])/i;
+const COMPLEX_HEALTH_TOPIC =
+  /reflux|zungenband|lippenband|orale? restriktion|gedeih|nimmt (kaum|nicht|schlecht) zu|diagnos|(?<!(keine|ohne) |un)auffällig|allerg|neurodermitis|apnoe|atemaussetz|schnarch|epilep|krampf|kiss-syndrom|chronisch/i;
+
+/** Deutliche gesundheitliche oder sehr komplexe Themen → 1:1-Beratung. */
+export function hasComplexHealthTopic(memory: any): boolean {
+  const health = String(memory.health ?? "");
+  if (health.trim() && !NO_HEALTH_TOPIC.test(health) && COMPLEX_HEALTH_TOPIC.test(health)) {
+    return true;
+  }
+  const other = [memory.mainProblem, memory.development, memory.feeding]
+    .filter((v): v is string => typeof v === "string")
+    .join(" | ");
+  return /reflux|zungenband|lippenband|orale? restriktion|gedeihstörung/i.test(other);
 }
 
 export function hasStructureIssues(memory: any): boolean {

@@ -4,6 +4,7 @@ import { buildHypotheses } from "./hypothesisEngine";
 import { ANALYSIS_ORDER_PROMPT, shouldAnalyse } from "./reasoningEngine";
 import type { ModeRecommendation } from "./recommendationEngine";
 import { buildModeOutputPrompt } from "./outputPrompts";
+import { buildStructurePromptSection } from "./structureCheck";
 
 export function buildPrompt(
   memory: Record<string, unknown>,
@@ -277,6 +278,8 @@ Selbst wenn eine mögliche Schlafassoziation erkennbar ist:
 
 Empfehlungen zum Lösen einer Schlafassoziation niemals aktiv aussprechen, solange die Grundlagen des Schlafs nicht berücksichtigt wurden.
 
+AUSNAHME: Meldet die automatische Altersprüfung "EINSCHLAFASSOZIATION ERKANNT" (dieselbe Einschlafhilfe zum Einschlafen und nachts zum Weiterschlafen), ist die Einschlafassoziation ein Schwerpunkt dieser Analyse. Dann benennst du sie behutsam und wertfrei als Schwerpunkt – weiterhin ohne Schritt-für-Schritt-Anleitung zum Auflösen.
+
 -----------------------------------------------------
 
 WENN DAS THEMA ÜBERHAUPT RELEVANT WIRD
@@ -441,6 +444,10 @@ Kinder dürfen darüber oder darunter liegen.
 Bewerte niemals ausschließlich anhand der Wachphase.
 Gehe aber eher davon aus, dass ein Kind noch nicht müde genug ist, als dass es übermüdet ist.
 Betrachte immer das Gesamtbild.
+
+-----------------------------------------------------
+
+${buildStructurePromptSection(memory)}
 
 -----------------------------------------------------
 

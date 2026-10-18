@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { askMimi } from "../services/openai";
+import { askMimi, getMimiMemory } from "../services/openai";
 import type { Message } from "./conversation";
 import { products as allProducts } from "../data/products";
+import { isPossibleSleepAssociation } from "../engine/associationEngine";
 import type { ResolvedCourseModule } from "../data/course";
 import ChatInput from "../components/ChatInput";
+import ReportRequestBox from "../components/ReportRequestBox";
 import { isCourseMode, resolveAppMode } from "../config";
 import { getMimiTheme } from "../theme";
 
@@ -318,6 +320,14 @@ Wie alt ist dein Kind aktuell?`,
                 </div>
               ))}
             </div>
+
+            <ReportRequestBox
+              messages={messages}
+              productId={recommendedProducts[0].id}
+              age={String(getMimiMemory().age ?? "")}
+              sleepAssociation={isPossibleSleepAssociation(getMimiMemory())}
+              theme={theme}
+            />
           </div>
         )}
 

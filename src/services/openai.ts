@@ -20,35 +20,18 @@ import type { ResolvedCourseModule } from "../data/course";
 import { products } from "../data/products";
 import { courseKnowledgeBase, courseModules } from "../data/course";
 
-const DEV_API_KEY = import.meta.env.VITE_OPENAI_API_KEY as string | undefined;
-
-/** Production uses Netlify Function so the key is read at runtime on the server. */
-const CHAT_ENDPOINT = import.meta.env.PROD
-  ? "/.netlify/functions/chat"
-  : "https://api.openai.com/v1/chat/completions";
+/**
+ * All OpenAI requests go through the Netlify Function, which holds the API key
+ * and fixes model, temperature and limits on the server.
+ * Locally, run `netlify dev` so the function is available.
+ */
+const CHAT_ENDPOINT = "/.netlify/functions/chat";
 
 async function chat(messages: Message[] | { role: string; content: string }[]) {
-  const headers: Record<string, string> = {
-    "Content-Type": "application/json",
-  };
-
-  if (!import.meta.env.PROD) {
-    if (!DEV_API_KEY) {
-      throw new Error(
-        "Missing VITE_OPENAI_API_KEY in .env for local development."
-      );
-    }
-    headers.Authorization = `Bearer ${DEV_API_KEY}`;
-  }
-
   const response = await fetch(CHAT_ENDPOINT, {
     method: "POST",
-    headers,
-    body: JSON.stringify({
-      model: "gpt-4.1-mini",
-      temperature: 0.4,
-      messages,
-    }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messages }),
   });
 
   if (!response.ok) {
@@ -56,6 +39,14 @@ async function chat(messages: Message[] | { role: string; content: string }[]) {
   }
 
   return response.json();
+}
+
+/** Latest extracted sleep profile (e.g. the age parents named at the start). */
+export function getMimiMemory(): Record<string, unknown> {
+  return ((globalThis as Record<string, unknown>).__mimiMemory ?? {}) as Record<
+    string,
+    unknown
+  >;
 }
 
 function buildCoursePromptSection(): string {

@@ -11,6 +11,8 @@ type Props = {
 
 const MIN_ROWS = 2;
 const MAX_ROWS = 10;
+/** Matches the server-side limit in the chat function. */
+const MAX_MESSAGE_CHARS = 2000;
 
 export default function ChatInput({
   value,
@@ -54,6 +56,7 @@ export default function ChatInput({
         ref={textareaRef}
         value={value}
         rows={MIN_ROWS}
+        maxLength={MAX_MESSAGE_CHARS}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {

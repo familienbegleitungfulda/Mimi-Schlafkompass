@@ -5,6 +5,7 @@ import {
   isPossibleSleepAssociation,
   isUnder6Months,
 } from "./associationEngine";
+import { checkStructure } from "./structureCheck";
 
 export interface Hypothesis {
   title: string;
@@ -15,30 +16,50 @@ export interface Hypothesis {
 export function buildHypotheses(memory: any): Hypothesis[] {
   const hypotheses: Hypothesis[] = [];
 
-  if (memory.wakeWindows && /(4|5|6|7)/.test(memory.wakeWindows)) {
+  const structure = checkStructure(memory);
+
+  if (structure.wakeMayBeFocus && structure.wakeStatus !== "unbekannt") {
     hypotheses.push({
       title: "Schlafdruck / Wachzeiten",
-      confidence: 85,
-      reason:
-        "Die Wachzeiten könnten für das angegebene Alter eventuell nicht optimal passen.",
+      confidence: structure.wakeStatus.startsWith("deutlich") ? 80 : 60,
+      reason: structure.wakeStatus.startsWith("deutlich")
+        ? `Die Wachphase liegt ${structure.wakeStatus} des altersüblichen Bereichs – vorsichtig einordnen und nach dem Verhalten fragen.`
+        : "Die Wachphase liegt im altersüblichen Rahmen, aber die Eltern beschreiben Anzeichen von Übermüdung oder Überreizung – das Verhalten zählt mehr als die Zahl.",
     });
   }
 
-  if (memory.napLength && /(20|25|30)/.test(memory.napLength)) {
+  if (
+    memory.napLength &&
+    /(20|25|30)/.test(memory.napLength) &&
+    (structure.ageMonths === null || structure.ageMonths >= 8)
+  ) {
     hypotheses.push({
       title: "Tagschlaf / Übermüdung",
-      confidence: 80,
+      confidence: 60,
       reason:
-        "Die Schläfchen wirken möglicherweise auffallend kurz – das könnte den Schlafdruck beeinflussen.",
+        "Die Schläfchen wirken möglicherweise auffallend kurz – nur relevant, wenn auch Übermüdungszeichen beschrieben werden.",
     });
   }
 
-  if (hasStructureIssues(memory)) {
+  if (
+    hasStructureIssues(memory) &&
+    structure.wakeStatus !== "unbekannt" &&
+    !structure.structureAgeAppropriate
+  ) {
     hypotheses.push({
       title: "Schlafstruktur",
-      confidence: 82,
+      confidence: 75,
       reason:
-        "Schlafdruck, Wachzeiten oder Tagschlaf könnten aktuell eine wichtigere Rolle spielen als andere Faktoren.",
+        "Wachzeiten oder Anzahl der Tagschläfchen weichen deutlich vom Alter ab und könnten eine Rolle spielen.",
+    });
+  }
+
+  if (structure.structureAgeAppropriate && structure.nightIssues.length > 0) {
+    hypotheses.push({
+      title: "Andere Ursachen für das nächtliche Aufwachen",
+      confidence: 70,
+      reason:
+        "Wachphasen und Tagschlaf sind altersgerecht. Mögliche andere Einflüsse: zu viel Gesamtschlaf in 24 Stunden, Reize und Erlebnisse am Tag, Entwicklungsschritte, Autonomie- oder Trennungsthemen, zurückhaltend auch eine Einschlafassoziation.",
     });
   }
 
