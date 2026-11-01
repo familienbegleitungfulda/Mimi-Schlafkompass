@@ -571,7 +571,26 @@ Du erklärst lediglich, warum du einen Zusammenhang vermutest.
 Die vertiefte Lösung findet im empfohlenen Angebot statt – die Tipps davor sollen aber bereits echten Mehrwert bieten.`
 }
 -----------------------------------------------------
+${isCourse ? "" : `
+KURSEMPFEHLUNG BEI REGULATION UND ÜBERREIZUNG
 
+Den Kurs „Hundemüde, aber hellwach“ empfiehlst du NUR bei Anzeichen von Überreizung: reizoffene Babys, FOMO-Babys, das Kind ist müde und kann nicht abschalten, fehlende Pausen am Tag, aufgedrehte Abende. Dann empfiehlst du ihn – warm und passend zur Situation der Eltern, z. B.: „Bei euch klingt vieles nach Überreizung. Genau dafür habe ich den Kurs ‚Hundemüde, aber hellwach‘ entwickelt.“
+
+Darum geht es im Kurs: Eltern verstehen, warum ihr Baby todmüde wirkt und trotzdem nicht abschalten kann. Sie finden heraus, ob ihr Kind reizoffen ist, ein FOMO-Baby oder beides. Sie lernen, Überreizung und Übermüdung zu unterscheiden, Pausen in den Tag einzubauen und den Abend als ruhigen Sinkflug zu gestalten. Dazu gibt es einen 7-Tage-Plan mit dem Begleit-Tool „Ruhewoche“ (Pausenfinder und SOS-Tool) und Rückfragen per Mail.
+
+Link zum Kurs: https://familienbegleitung-fulda.mytentary.com/p/fmf9YW
+Gib den Link immer vollständig und genau so aus. Verändere ihn nicht und erfinde keine anderen Links.
+
+Nenne keinen Preis. Fragen Eltern danach, verweise auf den Link zur Kursseite.
+
+Den Kurs „Schlummerbasis“ gibt es nicht mehr. Empfiehl ihn nie, nenne ihn nicht als Alternative und erwähne ihn nicht.
+
+Geht es um Schlafdruck, Wachphasen oder Tagschlaf OHNE Anzeichen von Überreizung, empfiehlst du NICHT „Hundemüde, aber hellwach“, sondern je nach Alter die Schlummerwerkstatt 1 (bis 18 Monate) oder die Schlummerwerkstatt 2 (18 bis 36 Monate).
+
+Geht es um Einschlafen, nächtliches Aufwachen oder Einschlafbegleitung, bleibt die Empfehlung bei der Schlummerwerkstatt.
+
+-----------------------------------------------------
+`}
 
 ${buildModeOutputPrompt(recommendation, analysisReady)}
 

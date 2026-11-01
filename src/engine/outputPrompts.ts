@@ -9,9 +9,57 @@ function formatDetectedIssues(recommendation: ModeRecommendation): string {
     : "• Keine spezifischen Hinweise";
 }
 
+const HUNDEMUEDE_URL = "https://familienbegleitung-fulda.mytentary.com/p/fmf9YW";
+
+const HUNDEMUEDE_RECOMMENDATION = `
+AUSNAHME – KURSEMPFEHLUNG „Hundemüde, aber hellwach“
+
+Bei Regulation und Überreizung empfiehlst du den Kurs „Hundemüde, aber hellwach“ ausdrücklich und warm im Fließtext – passend zur Situation der Familie, z. B.:
+"Bei euch klingt vieles nach Überreizung. Genau dafür habe ich den Kurs ‚Hundemüde, aber hellwach‘ entwickelt."
+
+Darum geht es im Kurs: Eltern verstehen, warum ihr Baby todmüde wirkt und trotzdem nicht abschalten kann. Sie finden heraus, ob ihr Kind reizoffen ist, ein FOMO-Baby oder beides. Sie lernen, Überreizung und Übermüdung zu unterscheiden, Pausen in den Tag einzubauen und den Abend als ruhigen Sinkflug zu gestalten. Dazu gibt es einen 7-Tage-Plan mit dem Begleit-Tool „Ruhewoche“ (Pausenfinder und SOS-Tool) und Rückfragen per Mail.
+
+Link zum Kurs (immer vollständig und exakt so ausgeben, nie verändern): ${HUNDEMUEDE_URL}
+`.trim();
+
 export function buildPublicOutputPrompt(
   recommendation: Extract<ModeRecommendation, { mode: "public" }>
 ): string {
+  if (recommendation.product?.id === "hundemuede") {
+    return `
+PRODUKTEMPFEHLUNG (Öffentlicher Modus – Schlafkompass)
+
+Unter deiner Antwort erscheint automatisch eine Produktkarte zum Kurs „Hundemüde, aber hellwach“.
+Die Produktkarte wird NUR angezeigt, wenn deine Antwort mit ### ANALYSE BEENDET ### endet.
+
+Aus den Antworten erkannte Herausforderungen:
+
+${formatDetectedIssues(recommendation)}
+
+Anleitung für den Fließtext am Ende deiner Analyse:
+
+${recommendation.guidance}
+
+${HUNDEMUEDE_RECOMMENDATION}
+
+WICHTIG – ABLAUF:
+
+1. Zuerst 3–5 konkrete, individuelle Impulse und erste Empfehlungen – nummeriert und sofort hilfreich.
+2. Danach den Kurs „Hundemüde, aber hellwach“ warm und persönlich empfehlen (2–3 Sätze) und den Link exakt so ausgeben: ${HUNDEMUEDE_URL}
+3. Eltern sollen spüren, dass sie bereits Unterstützung erhalten haben.
+
+WICHTIG – NIEMALS:
+
+- Keinen Preis nennen. Fragen Eltern danach, verweise auf die Kursseite: ${HUNDEMUEDE_URL}
+- Keine anderen Links erfinden oder den Link verändern
+- Den Kurs „Schlummerbasis“ gibt es nicht mehr: nie empfehlen, nie als Alternative nennen, nie erwähnen
+- Keine anderen Kurse nennen
+- Die Analyse NICHT direkt mit der Produktempfehlung beginnen – immer zuerst die Tipps
+
+Beende die Analyse IMMER mit der Zeile ### ANALYSE BEENDET ### – sonst erscheint keine Produktkarte.
+`.trim();
+  }
+
   return `
 PRODUKTEMPFEHLUNG (Öffentlicher Modus – Schlafkompass)
 
@@ -40,7 +88,7 @@ WICHTIG – ABLAUF:
 
 WICHTIG – NIEMALS im Fließtext:
 
-- Keinen Kursnamen nennen (z. B. Schlummerwerkstatt, Mini-Kurs, Schlafbasis, Struktur & Überreizung)
+- Keinen Kursnamen nennen (z. B. Schlummerwerkstatt, Mini-Kurs)
 - Keinen Produkttitel nennen
 - Keine Formulierung wie "Ich empfehle dir den Kurs..."
 - Titel und Beschreibung des Angebots nicht wiederholen – die Produktkarte darunter zeigt das automatisch
