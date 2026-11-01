@@ -5,7 +5,6 @@ import {
   getBedtimeSupport,
   hasComplexHealthTopic,
   isPossibleSleepAssociation,
-  isUnclearSleepAssociation,
 } from "./associationEngine";
 
 /**
@@ -14,9 +13,12 @@ import {
  * 1. 1:1-Beratung bei gesundheitlichen/sehr komplexen Themen oder wenn viele
  *    Themen gleichzeitig zusammenkommen.
  * 2. Papa-Kurs, wenn Papa/Mama-Entlastung der deutlichste Punkt ist (Hauptproblem).
- * 3. Schlummerwerkstatt 1/2 NUR bei eindeutiger Schlafassoziation.
- * 4. Papa-Kurs, wenn das Thema sonst im Gespräch vorkommt.
- * 5. Standard: Mini-Kurs Struktur & Überreizung.
+ * 3. Schlummerwerkstatt 1/2 bei eindeutiger Schlafassoziation.
+ * 4. „Hundemüde, aber hellwach“ NUR bei Anzeichen von Überreizung (reizoffen,
+ *    FOMO, müde und kann nicht abschalten, fehlende Pausen, aufgedrehte Abende).
+ * 5. Papa-Kurs, wenn das Thema sonst im Gespräch vorkommt.
+ * 6. Standard (Schlafdruck, Wachphasen, Tagschlaf ohne Überreizung):
+ *    Schlummerwerkstatt 1 (bis 18 Monate) bzw. 2 (18–36 Monate).
  */
 
 export type PublicProductId =
@@ -24,7 +26,7 @@ export type PublicProductId =
   | "papa"
   | "schlummerwerkstatt1"
   | "schlummerwerkstatt2"
-  | "struktur";
+  | "hundemuede";
 
 export type Product = (typeof products)[number];
 
@@ -64,7 +66,7 @@ function papaIsMainProblem(memory: any): boolean {
 }
 
 const OVERSTIMULATION =
-  /aufgedreht|überdreht|aufgekratzt|tobt|überreiz|reizüberflut|übermüd|hochsensib|high.?need|sensibel|kommt nicht zur ruhe|schwer zur ruhe/i;
+  /aufgedreht|überdreht|aufgekratzt|tobt|überreiz|reizüberflut|reizoffen|hochsensib|high.?need|sensibel|kommt nicht zur ruhe|schwer zur ruhe|nicht abschalten|fomo|regulation|reguliert|keine pausen?\b|unruhige?n? abend|abends (sehr |total |ganz )?unruhig/i;
 
 export function hasOverstimulationSigns(memory: any): boolean {
   return OVERSTIMULATION.test(
@@ -99,8 +101,9 @@ export function selectPublicProductId(memory: any): PublicProductId {
   }
   if (papaIsMainProblem(memory)) return "papa";
   if (isPossibleSleepAssociation(memory)) return schlummerwerkstattIdForAge(memory?.age);
+  if (hasOverstimulationSigns(memory)) return "hundemuede";
   if (hasPapaTopic(memory)) return "papa";
-  return "struktur";
+  return schlummerwerkstattIdForAge(memory?.age);
 }
 
 export function findProduct(id: string): Product | undefined {
@@ -132,10 +135,22 @@ function schlummerwerkstattReasons(memory: any, id: "schlummerwerkstatt1" | "sch
   const number = id === "schlummerwerkstatt2" ? 2 : 1;
   const support = SUPPORT_PHRASES[detectSupportType(getBedtimeSupport(memory)) ?? ""] ?? "mit einer bestimmten Hilfe";
   const age = ageLabel(memory);
+  const hasStructureInfo = text(memory, "wakeWindows", "naps", "napCount", "napLength") !== "";
 
-  reasons.push(
-    `Ihr habt erzählt, dass euer Kind nur ${support} einschläft und nachts dieselbe Hilfe zum Weiterschlafen braucht. In der Schlummerwerkstatt ${number} lernt ihr, diese Einschlafhilfe bindungsorientiert und in eurem Tempo zu verändern.`
-  );
+  if (isPossibleSleepAssociation(memory)) {
+    reasons.push(
+      `Ihr habt erzählt, dass euer Kind nur ${support} einschläft und nachts dieselbe Hilfe zum Weiterschlafen braucht. In der Schlummerwerkstatt ${number} lernt ihr, diese Einschlafhilfe bindungsorientiert und in eurem Tempo zu verändern.`
+    );
+  } else {
+    reasons.push(
+      `In der Schlummerwerkstatt ${number} schaut ihr euch Schlafdruck, Wachphasen und Tagschlaf genau an, damit die Schlafstruktur gut zu eurem Kind passt.`
+    );
+    if (LONG_FALLING_ASLEEP.test(text(memory, "bedtimeDuration"))) {
+      reasons.push(
+        "Langes Einschlafen kann ein Zeichen dafür sein, dass Schlafdruck und Einschlafzeitpunkt noch nicht gut zusammenpassen. Genau darum geht es im Kurs."
+      );
+    }
+  }
 
   if (age) {
     reasons.push(
@@ -145,7 +160,7 @@ function schlummerwerkstattReasons(memory: any, id: "schlummerwerkstatt1" | "sch
     );
   }
 
-  if (text(memory, "wakeWindows", "naps", "napCount", "napLength")) {
+  if (hasStructureInfo && isPossibleSleepAssociation(memory)) {
     reasons.push(
       "Ihr schaut euch auch Wachphasen, Tagschlaf und Schlafdruck an, damit jede Veränderung auf einer passenden Schlafstruktur aufbaut."
     );
@@ -155,41 +170,17 @@ function schlummerwerkstattReasons(memory: any, id: "schlummerwerkstatt1" | "sch
   return reasons;
 }
 
-function strukturReasons(memory: any): string[] {
-  const reasons: string[] = [];
-  const age = ageLabel(memory);
+function hundemuedeReasons(): string[] {
+  const reasons: string[] = [
+    "Bei euch klingt vieles nach Überreizung: Euer Kind wirkt todmüde und kann trotzdem nicht abschalten. Genau dafür hat Maya den Kurs „Hundemüde, aber hellwach“ entwickelt.",
+    "Ihr findet heraus, ob euer Kind reizoffen ist, ein FOMO-Baby oder beides, und lernt, Überreizung und Übermüdung zu unterscheiden.",
+  ];
 
-  if (hasOverstimulationSigns(memory)) {
-    reasons.push(
-      "Ihr habt erzählt, dass euer Kind abends schwer zur Ruhe kommt. Im Mini-Kurs lernt ihr, Überreizung und Übermüdung früh zu erkennen und den Tag so zu gestalten, dass euer Kind abends leichter abschalten kann."
-    );
-  }
+  reasons.push("Ihr lernt, Pausen in den Tag einzubauen, damit sich über den Tag weniger Reize ansammeln.");
 
-  if (LONG_FALLING_ASLEEP.test(text(memory, "bedtimeDuration", "mainProblem"))) {
-    reasons.push(
-      "Langes Einschlafen kann ein Zeichen dafür sein, dass Schlafdruck und Einschlafzeitpunkt noch nicht gut zusammenpassen. Genau darum geht es im Kurs."
-    );
-  }
-
-  if (text(memory, "wakeWindows", "naps", "napCount", "napLength")) {
-    reasons.push(
-      `Ihr bekommt Orientierung, welche Wachphasen und wie viel Tagschlaf${age ? ` mit ${age}` : ""} gut zu eurem Kind passen.`
-    );
-  }
-
-  if (isUnclearSleepAssociation(memory)) {
-    reasons.push(
-      "Ihr schaut zuerst auf Struktur und Schlafdruck. Das ist oft die wichtigste Stellschraube, bevor man an der Einschlafhilfe etwas verändert."
-    );
-  } else if (text(memory, "nightWakeups") && !NO_ANSWER.test(text(memory, "nightWakeups"))) {
-    reasons.push(
-      "Auch nächtliches Aufwachen hängt oft mit Schlafdruck und Tagesstruktur zusammen. Das schaut ihr euch im Kurs genauer an."
-    );
-  }
-
-  if (reasons.length < 2) {
-    reasons.push("Ihr bekommt einen klaren Überblick über Schlafdruck, Wachphasen und Tagesstruktur statt einzelner Tipps.");
-  }
+  reasons.push(
+    "Mit dem 7-Tage-Plan und dem Begleit-Tool „Ruhewoche“ (Pausenfinder und SOS-Tool) gestaltet ihr den Abend als ruhigen Sinkflug."
+  );
   return reasons;
 }
 
@@ -249,6 +240,6 @@ export function buildProductReasons(productId: string, memory: any): string[] {
         ? papaReasons(memory)
         : productId === "beratung"
           ? beratungReasons(memory)
-          : strukturReasons(memory);
+          : hundemuedeReasons();
   return reasons.slice(0, 4);
 }

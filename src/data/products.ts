@@ -1,23 +1,21 @@
 export const products = [
     {
-      id: "struktur",
-      title: "Mini-Kurs Struktur & Überreizung",
+      id: "hundemuede",
+      title: "Hundemüde, aber hellwach",
       description:
-        "Für Kinder mit unpassendem Schlafdruck, schwierigen Wachphasen oder Überreizung.",
-      url: "https://familienbegleitung-fulda.tentary.com/p/hkVsbx",
+        "Für Babys, die todmüde wirken und trotzdem nicht abschalten können: Überreizung und Übermüdung unterscheiden, Pausen in den Tag einbauen und den Abend als ruhigen Sinkflug gestalten. Mit 7-Tage-Plan, dem Begleit-Tool „Ruhewoche“ (Pausenfinder und SOS-Tool) und Rückfragen per Mail.",
+      url: "https://familienbegleitung-fulda.mytentary.com/p/fmf9YW",
       when: [
-        "Schlafdruck",
-        "Wachphasen",
-        "Übermüdung",
+        "Regulation",
         "Überreizung",
-        "Tagschlaf",
-        "lange Einschlafbegleitung",
-        "Dauernuckeln",
-        "nächtliche Wachphasen",
-        "weinen in der Einschlafbegleitung",
-        "Tagesstruktur"
+        "Reizoffenheit",
+        "FOMO-Baby",
+        "fehlende Pausen am Tag",
+        "unruhige Abende",
+        "übermüdet oder überreizt"
       ]
     },
+
   
     {
       id: "papa",

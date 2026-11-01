@@ -160,23 +160,36 @@ const PUBLIC_FOCUS: Record<PublicProductId, { courseFocus: string[]; hint: strin
     ],
     hint: "Das Einschlafen klappt bisher vor allem mit Mama bzw. Mama braucht Entlastung. Gib Impulse, wie Papa behutsam mehr Anteil an der Einschlafbegleitung bekommen kann.",
   },
-  struktur: {
+  hundemuede: {
     courseFocus: [
-      "altersgerechte Wachzeiten",
-      "Schlafdruck aufbauen",
-      "Reize besser dosieren",
-      "Tagesablauf strukturieren",
-      "Tagschlaf anpassen",
-      "leichter in den Schlaf finden",
+      "Überreizung und Übermüdung unterscheiden",
+      "reizoffen, FOMO-Baby oder beides",
+      "Pausen in den Tag einbauen",
+      "den Abend als ruhigen Sinkflug gestalten",
     ],
-    hint: "Wachzeiten, Schlafdruck, Tagschlaf, Tagesstruktur, Überreizung und Übermüdung.",
+    hint: "Regulation und Überreizung: Das Kind wirkt todmüde und kann trotzdem nicht abschalten (reizoffen, FOMO-Baby, fehlende Pausen am Tag, unruhige Abende). Gib Impulse zu Pausen im Tagesablauf und einem ruhigen Abend.",
   },
+};
+
+const SCHLUMMERWERKSTATT_STRUCTURE_FOCUS = {
+  courseFocus: [
+    "altersgerechte Wachzeiten",
+    "Schlafdruck aufbauen",
+    "Tagschlaf anpassen",
+    "Tagesablauf strukturieren",
+    "leichter in den Schlaf finden",
+  ],
+  hint: "Schlafstruktur: Wachzeiten, Schlafdruck, Tagschlaf und Tagesstruktur. Es gibt keine eindeutigen Anzeichen von Überreizung – sprich daher nicht von Überreizung.",
 };
 
 function buildPublicRecommendation(memory: any): PublicRecommendation {
   const context = buildAnalysisContext(memory);
   const productId = selectPublicProductId(memory);
-  const focus = PUBLIC_FOCUS[productId];
+  const focus =
+    (productId === "schlummerwerkstatt1" || productId === "schlummerwerkstatt2") &&
+    !isPossibleSleepAssociation(memory)
+      ? SCHLUMMERWERKSTATT_STRUCTURE_FOCUS
+      : PUBLIC_FOCUS[productId];
 
   if (isUnclearSleepAssociation(memory)) {
     context.detectedIssues.push(
