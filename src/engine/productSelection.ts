@@ -13,12 +13,12 @@ import {
  * 1. 1:1-Beratung bei gesundheitlichen/sehr komplexen Themen oder wenn viele
  *    Themen gleichzeitig zusammenkommen.
  * 2. Papa-Kurs, wenn Papa/Mama-Entlastung der deutlichste Punkt ist (Hauptproblem).
- * 3. Schlummerwerkstatt 1/2 bei eindeutiger Schlafassoziation.
- * 4. „Hundemüde, aber hellwach“ NUR bei Anzeichen von Überreizung (reizoffen,
- *    FOMO, müde und kann nicht abschalten, fehlende Pausen, aufgedrehte Abende).
- * 5. Papa-Kurs, wenn das Thema sonst im Gespräch vorkommt.
- * 6. Standard (Schlafdruck, Wachphasen, Tagschlaf ohne Überreizung):
- *    Schlummerwerkstatt 1 (bis 18 Monate) bzw. 2 (18–36 Monate).
+ * 3. „Hundemüde, aber hellwach“ bei jedem Anzeichen von Überreizung – auch wenn
+ *    zusätzlich eine Einschlafhilfe da ist. Die Schlummerwerkstatt wird dann nur
+ *    in der Begründung als nächster Schritt genannt (ohne Link, nicht in Brevo).
+ * 4. Papa-Kurs, wenn das Thema sonst im Gespräch vorkommt.
+ * 5. Sonst (keine Überreizung): Schlummerwerkstatt 1 (bis 18 Monate) bzw.
+ *    2 (18–36 Monate).
  */
 
 export type PublicProductId =
@@ -66,11 +66,11 @@ function papaIsMainProblem(memory: any): boolean {
 }
 
 const OVERSTIMULATION =
-  /aufgedreht|überdreht|aufgekratzt|tobt|überreiz|reizüberflut|reizoffen|hochsensib|high.?need|sensibel|kommt nicht zur ruhe|schwer zur ruhe|nicht abschalten|fomo|regulation|reguliert|keine pausen?\b|unruhige?n? abend|abends (sehr |total |ganz )?unruhig/i;
+  /aufgedreht|überdreht|aufgekratzt|tobt|überreiz|reizüberflut|reizoffen|hochsensib|high.?need|sensibel|kommt nicht zur ruhe|schwer zur ruhe|nicht abschalten|fomo|regulation|reguliert|keine pausen?\b|unruhige?n? abend|abends (sehr |total |ganz )?unruhig|kaum pausen?\b|nichts verpassen|schaut [^.!?|]{0,30}herum|guckt [^.!?|]{0,30}(herum|rum)|abgelenkt|(geräusch|licht)[^.!?|]{0,30}(stark|sofort|empfindlich|reagiert)|reagiert [^.!?|]{0,30}(geräusch|licht)/i;
 
 export function hasOverstimulationSigns(memory: any): boolean {
   return OVERSTIMULATION.test(
-    text(memory, "mainProblem", "temperament", "bedtimeDuration", "bedtimeRoutine", "sleepReadiness")
+    text(memory, "mainProblem", "temperament", "bedtimeDuration", "bedtimeRoutine", "sleepReadiness", "bedtimeSupport")
   );
 }
 
@@ -100,7 +100,6 @@ export function selectPublicProductId(memory: any): PublicProductId {
     return "beratung";
   }
   if (papaIsMainProblem(memory)) return "papa";
-  if (isPossibleSleepAssociation(memory)) return schlummerwerkstattIdForAge(memory?.age);
   if (hasOverstimulationSigns(memory)) return "hundemuede";
   if (hasPapaTopic(memory)) return "papa";
   return schlummerwerkstattIdForAge(memory?.age);
@@ -170,13 +169,19 @@ function schlummerwerkstattReasons(memory: any, id: "schlummerwerkstatt1" | "sch
   return reasons;
 }
 
-function hundemuedeReasons(): string[] {
+function hundemuedeReasons(memory: any): string[] {
   const reasons: string[] = [
     "Bei euch klingt vieles nach Überreizung: Euer Kind wirkt todmüde und kann trotzdem nicht abschalten. Genau dafür hat Maya den Kurs „Hundemüde, aber hellwach“ entwickelt.",
     "Ihr findet heraus, ob euer Kind reizoffen ist, ein FOMO-Baby oder beides, und lernt, Überreizung und Übermüdung zu unterscheiden.",
   ];
 
-  reasons.push("Ihr lernt, Pausen in den Tag einzubauen, damit sich über den Tag weniger Reize ansammeln.");
+  if (isPossibleSleepAssociation(memory)) {
+    reasons.push(
+      "Bevor ihr an der Einschlafhilfe arbeitet, braucht das Nervensystem eures Kindes mehr Ruhe. Darum ist „Hundemüde, aber hellwach“ euer erster Schritt. Wenn danach noch Einschlafhilfe oder nächtliches Aufwachen Thema sind, ist die Schlummerwerkstatt der nächste Schritt."
+    );
+  } else {
+    reasons.push("Ihr lernt, Pausen in den Tag einzubauen, damit sich über den Tag weniger Reize ansammeln.");
+  }
 
   reasons.push(
     "Mit dem 7-Tage-Plan und dem Begleit-Tool „Ruhewoche“ (Pausenfinder und SOS-Tool) gestaltet ihr den Abend als ruhigen Sinkflug."
@@ -240,6 +245,6 @@ export function buildProductReasons(productId: string, memory: any): string[] {
         ? papaReasons(memory)
         : productId === "beratung"
           ? beratungReasons(memory)
-          : hundemuedeReasons();
+          : hundemuedeReasons(memory);
   return reasons.slice(0, 4);
 }
